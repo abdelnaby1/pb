@@ -1,4 +1,4 @@
-import { BannerType, InputLoginNameTypes } from "../types";
+import { BannerType, InputBannerNameTypes, InputLoginNameTypes } from "../types";
 
 export interface IBanner {
     id: string
@@ -7,6 +7,17 @@ export interface IBanner {
 
 export interface ILoginInput{
     name: InputLoginNameTypes;
+    placeholder: string;
+    type: string;
+    validation:{
+        required?: boolean;
+        minLength?: number;
+        pattern?: RegExp
+    }
+}
+
+export interface IBannerInput{
+    name: InputBannerNameTypes;
     placeholder: string;
     type: string;
     validation:{

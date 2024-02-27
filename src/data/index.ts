@@ -1,14 +1,13 @@
-import { IBanner, ILoginInput } from "../interfaces";
+import { IBanner, IBannerInput, ILoginInput } from "../interfaces";
 
 export const bannerTypes: IBanner[] = [
   {
-    id: "1",
     type: "product",
-  
+    id: "1",
   },
   {
-    id: "2",
     type: "category", 
+    id: "2",
   }
 
 ]
@@ -25,5 +24,13 @@ export const LOGIN_FORM: ILoginInput[] = [
         placeholder: 'Password',
         type: 'password',
         validation: { required: true, minLength: 6 }
+    },
+]
+export const BANNER_FORM: IBannerInput[] = [
+        {
+        name: 'refId',
+        placeholder: 'Reference Id',
+        type: 'number',
+        validation: { required: true}
     },
 ]
