@@ -12,6 +12,6 @@ export const loginSchema = yup
   .object({
     refId: yup.number()
       .typeError('Reference Id must be a number').
-      positive("Reference Id must be a valid number").integer().required("Reference Id is required.")
+      positive("Reference Id must be a valid number").integer()
   })
   .required()

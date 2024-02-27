@@ -1,10 +1,10 @@
-import { addDoc, collection } from "firebase/firestore";
-import { ChangeEvent, useState ,useRef} from "react";
+import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
+import { ChangeEvent, useState ,useRef, useEffect} from "react";
 import Button from "../components/UI/Button";
 import Select from "../components/UI/Select";
 import { firestore, storage } from "../config/firebase";
 import { BANNER_FORM, bannerTypes } from "../data";
-import { IBanner } from "../interfaces";
+import {  IFireBaseBanner } from "../interfaces";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import InputErrorMesaage from "../components/InputErrorMesaage";
 import toast from "react-hot-toast";
@@ -13,6 +13,7 @@ import Input from "../components/UI/Input";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { addBannerSchema } from "../validation";
 import { yupResolver } from "@hookform/resolvers/yup";
+import BannerCard from "../components/BannerCard";
 
 const storageKey =  "loggedInUser";
 const userDataString = localStorage.getItem(storageKey);
@@ -22,15 +23,18 @@ interface IFormInput {
 }
 
 const HomePage = () => {
+  const [banners,setBanners] = useState<IFireBaseBanner[]>()
   const [bannerImg, setBannerImg] = useState<File | null>(null);
   const [bannerError, setBannerError] = useState<string>("")
-  const [selectedBannerType, setSelectedBannerType] = useState<IBanner>(bannerTypes[0]);
+  const [selectedBannerTypeId, setSelectedBannerTypeId] = useState<number>(bannerTypes[0].id);
   const [isLoading, setIsLoading] = useState<boolean>(false)
+
   const { register, formState: { errors }, reset,handleSubmit } = useForm<IFormInput>({resolver:yupResolver(addBannerSchema)})
+
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
-  
     setIsLoading(true)    
     await addBannerToDb(data);
+    clearInput();
     reset()
   }
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -83,17 +87,12 @@ const HomePage = () => {
     }
   const addBannerToDb = async (data: IFormInput) => {   
     const url = await uploadBannerToStorage();  
-    console.log({
-        url: url,
-        type: selectedBannerType.type,
-        refId: data.refId
-      });
-    
     try {
       await addDoc(collection(firestore, "banners"),{
         url: url,
-        type: selectedBannerType.type,
-        refId: data.refId
+        typeId: selectedBannerTypeId,
+        refId: selectedBannerTypeId !== 1 ? data.refId : null,
+        userId: userData.uid
       });
 
       toast.success('Banner added successfully ', {
@@ -119,12 +118,12 @@ const HomePage = () => {
         })
       } finally{
         setIsLoading(false)
-        clearInput();
       }
     }
 
 
-
+    console.log(errors);
+    
 
     // const deleteDoce = async() => {
     //   try {
@@ -137,22 +136,64 @@ const HomePage = () => {
 
    
   
- const renderBannerForm = BANNER_FORM.map((input, idx) => {
-    return (
-      <div key={idx}>
-          <label className='text-gray-700 mb-[1px] font-medium text-sm'>Reference ID</label>
-          <Input placeholder={input.placeholder}  
-            type={input.type}
-            {...register(input.name, input.validation)}  
-            />
-            {errors[input.name] && <InputErrorMesaage msg={errors[input.name]?.message} />}
-           
-        </div>
-    )
+
+  useEffect(() => {
+    getBanners();
+
+   
+  }, [])
+  const getBanners = async () => {
+    try {
+      const bannerDocs: IFireBaseBanner[]= [];
+      const q = query(collection(firestore, "banners"),where("userId","==",userData.uid));
+      const querySnapshot = await getDocs(q);
+      querySnapshot.docs.forEach(doc=> {
+          // console.log("data",{...doc.data()});
+          const obj = doc.data();
+          
+          const bannerObj:IFireBaseBanner = {
+            id: doc.id,
+            userId: obj.userId,
+            url: obj.url,
+            type: obj.type,
+            refId: obj.refId
+          }
+          bannerDocs.push(bannerObj);
+      })
+      setBanners(bannerDocs);
+      // console.log(banners);
+      
+            
+    } catch (error) {
+      console.log(error);
+      
+    }
+  }
+  const renderBannerList = banners?.map((banner: IFireBaseBanner) => 
+     <BannerCard key={banner.id} banner={banner}
+    
+    />
+  )
+   const renderBannerForm = BANNER_FORM.map((input, idx) => {
+    if(selectedBannerTypeId !==1){
+      return (
+            <div key={idx}>
+                <label className='text-gray-700 mb-[1px] font-medium text-sm'>Reference ID</label>
+                <Input placeholder={input.placeholder}  
+                  type={input.type}
+                  {...register(input.name, input.validation)}  
+                  />
+                  {errors[input.name] && <InputErrorMesaage msg={errors[input.name]?.message} />}
+                
+              </div>
+          )
+    }
+    
  
   })
   return (
-    <section className="max-w-2xl mx-auto">
+    <>
+      <section className="max-w-2xl mx-auto">
         <h2 className="text-center mb-4 text-3xl font-semibold">Add Banner</h2>
         <form className="space-y-4"  onSubmit={handleSubmit(onSubmit)}>
           <div className='flex flex-col space-y-2'>
@@ -160,14 +201,18 @@ const HomePage = () => {
             <input required ref={fileInputRef} onChange={onInputFileChangeHandler} className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-foreground file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50" id="file_input" type="file" />            
             {bannerError && <InputErrorMesaage msg={bannerError} />}
           </div>
-          <Select selected={selectedBannerType} setSelected={setSelectedBannerType}/>
-          {renderBannerForm}
+          <Select selectedId={selectedBannerTypeId} setSelectedId={setSelectedBannerTypeId}/>
+          {selectedBannerTypeId !== 1 ? renderBannerForm : null}
           <Button fullWidth isLoading={isLoading}>
             Add Banner
           </Button>
         </form>
+        
     </section>
-
+      <div className="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-4 p-2 rounded-md">
+        {renderBannerList}
+      </div>
+    </>
   );
 };
 

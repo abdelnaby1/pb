@@ -3,21 +3,26 @@ import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/16/solid"
 import { Fragment } from "react/jsx-runtime"
 import { bannerTypes } from "../../data"
 import { IBanner } from "../../interfaces"
+import { BannerType } from "../../types"
 
 interface IProps{
-    selected: {type:string}
-    setSelected: (banner: IBanner)=> void
+    selectedId: number
+    setSelectedId: (id: number)=> void
 }
 
-const Select = ({selected,setSelected}:IProps) => {
-    
+const Select = ({selectedId,setSelectedId}:IProps) => {
+  const bannerType = bannerTypes.find(bannerTpe => bannerTpe.id === selectedId)
+  const onChangeHandler = (e :BannerType) => {
+    const selected = bannerTypes.find(bannerTpe => bannerTpe.type === e)
+    setSelectedId(selected?.id!)
+  }
   return (
-      <Listbox value={selected} onChange={(setSelected)}>
+      <Listbox value={bannerType?.type} onChange={(e) => onChangeHandler(e)}>
         <Listbox.Label as="p" className="text-left text-gray-700 mb-[1px] font-medium text-sm">Banner Type</Listbox.Label>
         <div className="relative mt-1">
           <Listbox.Button className="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
             <span className='flex items-center'>
-                <span className="ml-3 block truncate">{selected.type}</span>
+                <span className="ml-3 block truncate">{bannerType?.type}</span>
             </span>
             <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
               <ChevronUpDownIcon
@@ -41,7 +46,7 @@ const Select = ({selected,setSelected}:IProps) => {
                       active ? 'bg-amber-100 text-amber-900' : 'text-gray-900'
                     }`
                   }
-                  value={banner}
+                  value={banner.type}
                 >
                   {({ selected }) => (
                     <div className='flex items-center '>

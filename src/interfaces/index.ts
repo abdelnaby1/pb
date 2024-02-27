@@ -1,7 +1,7 @@
 import { BannerType, InputBannerNameTypes, InputLoginNameTypes } from "../types";
 
 export interface IBanner {
-    id: string
+    id: number
     type: BannerType 
 }
 
@@ -25,4 +25,12 @@ export interface IBannerInput{
         minLength?: number;
         pattern?: RegExp
     }
+}
+
+export interface IFireBaseBanner{
+    id:string
+    userId: string;
+    url: string;
+    type: string;
+    refId: number
 }

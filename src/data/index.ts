@@ -1,13 +1,17 @@
 import { IBanner, IBannerInput, ILoginInput } from "../interfaces";
 
 export const bannerTypes: IBanner[] = [
+   {
+    type: "default",
+    id: 1,
+  },
   {
     type: "product",
-    id: "1",
+    id: 2,
   },
   {
     type: "category", 
-    id: "2",
+    id: 3,
   }
 
 ]
