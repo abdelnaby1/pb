@@ -168,7 +168,7 @@ const HomePage = () => {
     getBanners();
 
    
-  }, [banners])
+  }, [])
 
    useEffect(() => {
     if (selectedBannerTypeId === 1) {
