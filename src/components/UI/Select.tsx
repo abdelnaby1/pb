@@ -2,7 +2,6 @@ import { Listbox, Transition } from "@headlessui/react"
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/16/solid"
 import { Fragment } from "react/jsx-runtime"
 import { bannerTypes } from "../../data"
-import { IBanner } from "../../interfaces"
 import { BannerType } from "../../types"
 
 interface IProps{
@@ -14,7 +13,9 @@ const Select = ({selectedId,setSelectedId}:IProps) => {
   const bannerType = bannerTypes.find(bannerTpe => bannerTpe.id === selectedId)
   const onChangeHandler = (e :BannerType) => {
     const selected = bannerTypes.find(bannerTpe => bannerTpe.type === e)
-    setSelectedId(selected?.id!)
+    if(selected){
+      setSelectedId(selected?.id)
+    }
   }
   return (
       <Listbox value={bannerType?.type} onChange={(e) => onChangeHandler(e)}>

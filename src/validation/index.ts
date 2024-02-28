@@ -9,9 +9,9 @@ export const loginSchema = yup
   .required()
 
   export const addBannerSchema = yup
-  .object({
+  .object().shape({
     refId: yup.number()
       .typeError('Reference Id must be a number').
-      positive("Reference Id must be a valid number").integer()
+      positive("Reference Id must be a valid number").integer("Reference Id must be a valid Id")
   })
   .required()

@@ -19,17 +19,20 @@ const storageKey =  "loggedInUser";
 const userDataString = localStorage.getItem(storageKey);
 const userData = userDataString ? JSON.parse(userDataString): null;
 interface IFormInput {
-  refId: number
+  refId?: number
 }
 
 const HomePage = () => {
-  const [banners,setBanners] = useState<IFireBaseBanner[]>()
   const [bannerImg, setBannerImg] = useState<File | null>(null);
-  const [bannerError, setBannerError] = useState<string>("")
+  const [bannerImgError, setBannerImgError] = useState<string>("")
+
   const [selectedBannerTypeId, setSelectedBannerTypeId] = useState<number>(bannerTypes[0].id);
+
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
-  const { register, formState: { errors }, reset,handleSubmit } = useForm<IFormInput>({resolver:yupResolver(addBannerSchema)})
+  const [banners,setBanners] = useState<IFireBaseBanner[]>()
+
+  const { register,unregister, formState: { errors }, reset,handleSubmit } = useForm<IFormInput>({resolver:yupResolver(addBannerSchema)})
 
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
     setIsLoading(true)    
@@ -44,21 +47,21 @@ const HomePage = () => {
 
   }
   const onInputFileChangeHandler = (e:ChangeEvent<HTMLInputElement>) => {
-      setBannerError("");
+      setBannerImgError("");
       const selectedImg = e?.target?.files?.[0];
       if (!selectedImg) {
-          setBannerError('Please select file');
+          setBannerImgError('Please select file');
           return;
       }
       if (!selectedImg.type.includes('image')) {
-          setBannerError('Please select image file');
+          setBannerImgError('Please select image file');
           return;
       }
       if (selectedImg.size > 1000000) {
-          setBannerError('Please select smaller file size');
+          setBannerImgError('Please select smaller file size');
           return;
       }
-      setBannerError("");
+      setBannerImgError("");
       setBannerImg(selectedImg);
   }
 
@@ -122,7 +125,6 @@ const HomePage = () => {
     }
 
 
-    console.log(errors);
     
 
     // const deleteDoce = async() => {
@@ -138,30 +140,24 @@ const HomePage = () => {
   
 
   useEffect(() => {
-    getBanners();
-
-   
-  }, [])
-  const getBanners = async () => {
+     const getBanners = async () => {
     try {
       const bannerDocs: IFireBaseBanner[]= [];
       const q = query(collection(firestore, "banners"),where("userId","==",userData.uid));
       const querySnapshot = await getDocs(q);
       querySnapshot.docs.forEach(doc=> {
-          // console.log("data",{...doc.data()});
           const obj = doc.data();
           
           const bannerObj:IFireBaseBanner = {
             id: doc.id,
             userId: obj.userId,
             url: obj.url,
-            type: obj.type,
+            typeId: obj.typeId,
             refId: obj.refId
           }
           bannerDocs.push(bannerObj);
       })
       setBanners(bannerDocs);
-      // console.log(banners);
       
             
     } catch (error) {
@@ -169,9 +165,21 @@ const HomePage = () => {
       
     }
   }
+    getBanners();
+
+   
+  }, [banners])
+
+   useEffect(() => {
+    if (selectedBannerTypeId === 1) {
+      unregister("refId");
+    }
+  }, [selectedBannerTypeId, unregister]);
+
+ 
   const renderBannerList = banners?.map((banner: IFireBaseBanner) => 
      <BannerCard key={banner.id} banner={banner}
-    
+
     />
   )
    const renderBannerForm = BANNER_FORM.map((input, idx) => {
@@ -199,7 +207,7 @@ const HomePage = () => {
           <div className='flex flex-col space-y-2'>
             <label className='text-gray-700 mb-[1px] font-medium text-sm'  htmlFor="file_input">Upload file</label>
             <input required ref={fileInputRef} onChange={onInputFileChangeHandler} className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-foreground file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50" id="file_input" type="file" />            
-            {bannerError && <InputErrorMesaage msg={bannerError} />}
+            {bannerImgError && <InputErrorMesaage msg={bannerImgError} />}
           </div>
           <Select selectedId={selectedBannerTypeId} setSelectedId={setSelectedBannerTypeId}/>
           {selectedBannerTypeId !== 1 ? renderBannerForm : null}
