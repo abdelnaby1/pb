@@ -21,7 +21,7 @@ const Navbar = () => {
         </li>
 
        
-          {!userData ? (
+          {userData ? (
           <div className="flex items-center space-x-6">
             <li className="duration-200 text-md text-gray-700 font-semibold">
               <NavLink to="/profile">Profile</NavLink>
@@ -35,9 +35,9 @@ const Navbar = () => {
             {/* <li className=" duration-200 font-semibold text-lg">
               <a>{userData?.name}</a>
             </li> */}
-            {/* <li className="text-white duration-200 font-semibold text-lg">
+            <li className="text-white duration-200 font-semibold text-lg">
               <NavLink to="/login">Login</NavLink>
-            </li> */}
+            </li>
           </p>
         )}
   
