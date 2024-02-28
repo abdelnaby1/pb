@@ -32,5 +32,5 @@ export interface IFireBaseBanner{
     userId: string;
     url: string;
     typeId: number;
-    refId: number
+    refId: number | null
 }

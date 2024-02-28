@@ -89,14 +89,19 @@ const HomePage = () => {
       return url;
     }
   const addBannerToDb = async (data: IFormInput) => {   
-    const url = await uploadBannerToStorage();  
-    try {
-      await addDoc(collection(firestore, "banners"),{
-        url: url,
+    const url = await uploadBannerToStorage();
+    const bannerObj: IFireBaseBanner = {
+        id:"",
+        url:"",
         typeId: selectedBannerTypeId,
-        refId: selectedBannerTypeId !== 1 ? data.refId : null,
+        refId: selectedBannerTypeId === 1 || data.refId === undefined? null : data.refId,
         userId: userData.uid
-      });
+    }
+    if(url){
+      bannerObj.url = url
+    }
+    try {
+      const doc = await addDoc(collection(firestore, "banners"),bannerObj);
 
       toast.success('Banner added successfully ', {
           duration: 1500,
@@ -108,6 +113,10 @@ const HomePage = () => {
           }
       });
       setBannerImg(null)
+      bannerObj.id = doc.id;
+      console.log(bannerObj);
+      banners?.push(bannerObj)
+      setBanners(banners)
       } catch (e) {
         const errorObj = e as FirebaseError      
         toast.error(`${errorObj.message}`, {
