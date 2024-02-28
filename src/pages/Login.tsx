@@ -23,8 +23,8 @@ const LoginPage = () => {
       
   }
   const login =  async (usrEmail:string, password: string ) =>{
-    const auth = getAuth();
     try {
+      const auth = getAuth();
       const userCredential =  await signInWithEmailAndPassword(auth, usrEmail, password)  
       const {uid,email}= userCredential.user;
       const token = await userCredential.user.getIdToken();
