@@ -10,7 +10,12 @@ export const loginSchema = yup
 
   export const addBannerSchema = yup
   .object().shape({
-    refId: yup.number()
+    name_en: yup.string().required("Name in English required"),
+    name_ar: yup.string().required("Name in Arabic required"),
+    url_en: yup.string().required("Url in Arabic required"),
+    url_ar: yup.string().required("Url in Arabic required"),
+    ref_type: yup.string().required("Reference Type is required"),
+    ref_id: yup.number()
       .typeError('Reference Id must be a number').
       positive("Reference Id must be a valid number").integer("Reference Id must be a valid Id")
   })
