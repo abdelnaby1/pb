@@ -15,7 +15,7 @@ const HomePage = () => {
   }
   const onCloseAddModal = () => {
     setWidgetType("")
-    setIsOpenAddModal(false)
+    setIsOpenAddModal(false)    
   }
   console.log(widgetType);
   
@@ -40,7 +40,7 @@ const HomePage = () => {
         </div>
         <Modal isOpen={isOpenAddModal} closeModal={onCloseAddModal} title="Add Widget">
           <WidgetsTypes setWidgetType={setWidget} />
-          <WidgetForm type={widgetType}/>
+          <WidgetForm onCloseModal={onCloseAddModal} type={widgetType}/>
         </Modal>
       </section>
       <div>Widgets</div>

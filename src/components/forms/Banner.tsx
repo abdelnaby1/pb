@@ -9,19 +9,21 @@ import Input from "../UI/Input";
 import { uploadBannerToStorage } from "../../firebase/functions";
 import toast from "react-hot-toast";
 import Select from "../UI/Select";
-import { arrayUnion, getDocs, setDoc, updateDoc } from "firebase/firestore";
+import { arrayUnion,  setDoc } from "firebase/firestore";
 import {  firestore } from "../../firebase/config";
 import { doc } from "firebase/firestore";
 
 const storageKey =  "loggedInUser";
 const userDataString = localStorage.getItem(storageKey);
 const userData = userDataString ? JSON.parse(userDataString): null;
-
+interface IProps{
+    onClose: () => void
+}
 interface IImgInput{
     [banner_img_en:string]: File 
     banner_img_ar: File
 }
-interface IFormInput {
+interface IBanner {
     name_en: string,
     name_ar: string,
     url_en: string,
@@ -29,7 +31,7 @@ interface IFormInput {
     ref_type: string,
     ref_id?: number
 }
-const defaultBanner: IFormInput = {
+const defaultBanner: IBanner = {
     name_en: "",
     name_ar: "",
     url_en: "",
@@ -37,34 +39,30 @@ const defaultBanner: IFormInput = {
     ref_type: "",
 }
 
-const BannerForm = () => {
+const BannerForm = ({onClose}:IProps) => {
     const [bannerData,setBannerData] = useState(defaultBanner)
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [bannerImgs, setBannerImgs] = useState<IImgInput>(null);
     const [bannerImgEnError, setBannerImgEnError] = useState<string>("")
     const [bannerImgArError, setBannerImgArError] = useState<string>("")
     const [selectedBannerTypeId, setSelectedBannerTypeId] = useState<number>(bannerTypes[0].id);
-    const { register,setValue,unregister,clearErrors, formState: { errors }, handleSubmit } = useForm<IFormInput>({
+    const { register,setValue,unregister,clearErrors, formState: { errors }, handleSubmit } = useForm<IBanner>({
         defaultValues: bannerData,
         resolver: yupResolver(addBannerSchema)
     })
 
-    const onBannerSubmit: SubmitHandler<IFormInput> = async (data) => {
+    const onBannerSubmit: SubmitHandler<IBanner> = async (data) => {
         setIsLoading(true)
-        console.log("data",data);
-        setBannerData({...bannerData,...data})
+        setBannerData(prev => ({...prev,...data}))
 
-         try {
-            console.log("data",bannerData);
+        //need to enhance
+        const banner = {
+            ...bannerData,...data
+        }
+        try {
             
             const widgetsRef = doc(firestore, `${userData.uid}`, "widgets");
-            // console.log("doc",widgetsRef.id);
-            
-            // const doc = await update(collection(firestore,"w"),bannerData);
-            await updateDoc(widgetsRef,{
-                widgets: arrayUnion(bannerData)
-            } );
-            
+            await setDoc(widgetsRef,{data: arrayUnion(banner)},{merge:true})
             toast.success('Banner added successfully ', {
                 duration: 1500,
                 position: 'top-center',
@@ -75,19 +73,25 @@ const BannerForm = () => {
                 }
             });
         }catch(error){
-            console.log(error);
-            
+        toast.error('Someting went wrong', {
+          duration: 4000,
+          position: 'top-center',
+          style: {
+            backgroundColor: "black",
+            color: "white",
+            width: "fit-content",
+          }
+        })    
         }finally{
             setIsLoading(false)
+            onClose();        
+
         }
-        
-        
     }
     const onInputFileEnChangeHandler = (e:ChangeEvent<HTMLInputElement>) => {
       setBannerImgEnError("");
       
       const selectedImg = e?.target?.files?.[0];
-      console.log(e.target.files);
 
       if (!selectedImg) {
           setBannerImgEnError('Please select file');
@@ -108,7 +112,6 @@ const BannerForm = () => {
       setBannerImgArError("");
       
       const selectedImg = e?.target?.files?.[0];
-      console.log(e.target.files);
 
       if (!selectedImg) {
           setBannerImgArError('Please select file');
@@ -151,33 +154,27 @@ const BannerForm = () => {
                 }
             });
         } catch (error) {
-            console.log(error);
+            // const errorObj = error as FirebaseError   
+             toast.error('Someting went wrong', {
+                duration: 1500,
+                position: 'top-center',
+                style: {
+                    backgroundColor: "black",
+                    color: "white",
+                    width: "fit-content",
+                }
+            });
             
         }
         finally{
             setIsLoading(false)
-            // setImageUploaded(true)
         }
     
     }
 
     
     
-    const renderBannerForm = BANNER_FORM.map((input, idx) => {
-      
 
-      return (
-            <div key={idx} className="flex flex-col">
-                <Input placeholder={input.placeholder}  
-                  type={input.type}
-                  {...register(input.name, input.validation)}  
-                  />
-                  {errors[input.name] && <InputErrorMesaage msg={errors[input.name]?.message} />}
-                
-              </div>
-          )
-  })
-  
  
   
   useEffect(() => {
@@ -191,7 +188,22 @@ const BannerForm = () => {
     
   }, [selectedBannerTypeId, setValue, unregister])
   
-  
+
+
+    const renderBannerForm = BANNER_FORM.map((input, idx) => {
+      return (
+            <div key={idx} className="flex flex-col">
+                <Input placeholder={input.placeholder}  
+                  type={input.type}
+                  {...register(input.name, input.validation)}  
+                  />
+                  {errors[input.name] && <InputErrorMesaage msg={errors[input.name]?.message} />}
+                
+              </div>
+          )
+    })
+
+    
   return (
     <div className="mt-5">
         <h2 className="text-center mb-4 text-3xl font-semibold">Add Banner</h2>
