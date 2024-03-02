@@ -31,10 +31,49 @@ export const LOGIN_FORM: ILoginInput[] = [
     },
 ]
 export const BANNER_FORM: IBannerInput[] = [
-        {
-        name: 'refId',
-        placeholder: 'Reference Id',
-        type: 'number',
-        validation: { required: true}
+    {
+      name: 'name_en',
+      placeholder: 'Name in English',
+      type: 'string',
+      validation: { required: true}
     },
+    {
+      name: 'name_ar',
+      placeholder: 'Name in Arabic',
+      type: 'string',
+      validation: { required: true}
+    },
+    //      {
+    //   name: 'ref_id',
+    //   placeholder: 'Reference Id',
+    //   type: 'number',
+    //   validation: { required: true}
+    // },
+
+ 
 ]
+
+    // {
+    //   name: 'url_en',
+    //   placeholder: 'Url in English',
+    //   type: 'string',
+    //   validation: { required: true}
+    // },
+    // {
+    //   name: 'url_ar',
+    //   placeholder: 'Url in Arabic',
+    //   type: 'string',
+    //   validation: { required: true}
+    // },
+    //     {
+    //   name: 'ref_type',
+    //   placeholder: 'Reference Type',
+    //   type: 'string',
+    //   validation: { required: true}
+    // },
+    //    {
+    //   name: 'ref_id',
+    //   placeholder: 'Reference Id',
+    //   type: 'number',
+    //   validation: { required: true}
+    // },
