@@ -14,16 +14,16 @@ const Navbar = () => {
     }, 1500);
   }
   return (
-    <nav className="max-w-2xl mx-auto mt-7 mb-20 px-3 py-5">
+    <nav className="mx-auto mb-20 px-4 rounded-b-sm py-5 bg-slate-950">
       <ul className="flex items-center justify-between">
-        <li className="duration-200 font-semibold text-md text-gray-700">
+        <li className="duration-200 font-semibold text-md text-white">
           <NavLink to="/">Home</NavLink>
         </li>
 
        
           {userData ? (
           <div className="flex items-center space-x-6">
-            <li className="duration-200 text-md text-gray-700 font-semibold">
+            <li className="duration-200 text-md text-white font-semibold">
               <NavLink to="/profile">Profile</NavLink>
             </li>
             <Button className="cursor-pointer" size={"sm"} onClick={onLogout}>
