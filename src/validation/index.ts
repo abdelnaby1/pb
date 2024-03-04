@@ -20,3 +20,10 @@ export const loginSchema = yup
       positive("Reference Id must be a valid number").integer("Reference Id must be a valid Id")
   })
   .required()
+
+   export const addBrandSchema = yup
+  .object().shape({
+    name_en: yup.string().required("Name in English required"),
+    name_ar: yup.string().required("Name in Arabic required"),
+  })
+  .required()

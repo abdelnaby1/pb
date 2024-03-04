@@ -20,7 +20,7 @@ const WidgetForm = ({type,onCloseModal}: IProps) => {
   const widgetTypeForm: Types = {
   Banner: <BannerForm onClose={onCloseModal}/>,
   Slider: <SliderForm />,
-  Brands: <BrandsForm />,
+  Brands: <BrandsForm onClose={onCloseModal} />,
   ["Horiznotal Products"]: <HoriznotalProductsForm />,
   ["Vertical Products"]: <VerticalProductsForm />,
 

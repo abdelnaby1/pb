@@ -57,7 +57,9 @@ const BannerForm = ({onClose}:IProps) => {
 
         //need to enhance
         const banner = {
-            ...bannerData,...data
+            ...bannerData,
+            ...data,
+            component_type: "Banner"
         }
         try {
             
@@ -206,7 +208,7 @@ const BannerForm = ({onClose}:IProps) => {
     
   return (
     <div className="mt-5">
-        <h2 className="text-center mb-4 text-3xl font-semibold">Add Banner</h2>
+        <h2 className="text-center mb-4 text-3xl font-semibold">Add Banner Widget</h2>
         {!bannerData.url_en && !bannerData.name_ar &&(
             <form className="space-y-4" onSubmit={uploadImages}>
                 <div className='flex flex-row items-center justify-center space-x-2'>
@@ -247,7 +249,7 @@ const BannerForm = ({onClose}:IProps) => {
                 ) : null}
                 <Select selectedId={selectedBannerTypeId} setSelectedId={setSelectedBannerTypeId}/>
                 <Button fullWidth isLoading={isLoading}>
-                    Add Banner
+                    Submit
                 </Button>
             </form> 
         )}
