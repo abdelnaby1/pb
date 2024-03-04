@@ -27,3 +27,13 @@ export const loginSchema = yup
     name_ar: yup.string().required("Name in Arabic required"),
   })
   .required()
+
+  export const addProductsSchema = yup
+  .object().shape({
+    name_en: yup.string().required("Name in English required"),
+    name_ar: yup.string().required("Name in Arabic required"),
+    cat_id: yup.number().required("Category ID is required").typeError('Reference Id must be a number')
+        .positive("Reference Id must be a valid number").integer("Reference Id must be a valid Id")
+
+  })
+  .required()

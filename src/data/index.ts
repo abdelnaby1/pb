@@ -1,4 +1,4 @@
-import { IBanner, IBannerInput, IBrandInput, ILoginInput } from "../interfaces";
+import { IBanner, IBannerInput, IBrandInput, ILoginInput, IProductsInput } from "../interfaces";
 
 export const bannerTypes: IBanner[] = [
    {
@@ -60,4 +60,24 @@ export const BRANDS_FORM: IBrandInput[] = [
     },
 ]
 
+export const PRODUCTS_FORM: IProductsInput[] = [
+    {
+      name: 'name_en',
+      placeholder: 'Name in English',
+      type: 'string',
+      validation: { required: true}
+    },
+    {
+      name: 'name_ar',
+      placeholder: 'Name in Arabic',
+      type: 'string',
+      validation: { required: true}
+    },
+     {
+      name: "cat_id",
+      placeholder: 'Category Id',
+      type: 'string',
+      validation: { required: true}
+    },
+]
     
