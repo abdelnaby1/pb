@@ -79,7 +79,7 @@ const BrandsForm = ({onClose}:IProps) => {
                       Submit
             </Button>
           </form> 
-        </div>
+      </div>
   )
 }
 
