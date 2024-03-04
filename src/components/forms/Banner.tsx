@@ -216,7 +216,7 @@ const BannerForm = ({onClose}:IProps) => {
                         {bannerImgEnError && <InputErrorMesaage msg={bannerImgEnError} />}
                     </div>
                     <div  className="space-y-2">
-                        <label className='text-gray-700 mb-[1px] font-medium text-sm' htmlFor="banner_img_ar">Choose English Image</label>
+                        <label className='text-gray-700 mb-[1px] font-medium text-sm' htmlFor="banner_img_ar">Choose Arabic Image</label>
                         <input name="banner_img_ar" required onChange={onInputFileArChangeHandler} className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-foreground file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50" id="banner_img_ar" type="file" />            
                         {bannerImgArError && <InputErrorMesaage msg={bannerImgArError} />}
                     </div>

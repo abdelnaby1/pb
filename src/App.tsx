@@ -8,7 +8,7 @@ import { RouterProvider } from 'react-router-dom';
 function App() {
  
   return (
-    <main className='container'>
+    <main className=''>
       <RouterProvider router={router} />
       <Toaster />
     </main>
