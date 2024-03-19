@@ -9,7 +9,7 @@ import Input from "../UI/Input";
 import { uploadBannerToStorage } from "../../firebase/functions";
 import toast from "react-hot-toast";
 import Select from "../UI/Select";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { firestore } from "../../firebase/config";
 
 const storageKey = "loggedInUser";
@@ -65,12 +65,13 @@ const BannerForm = ({ onClose }: IProps) => {
     setBannerData((prev) => ({ ...prev, ...data }));
 
     //need to enhance
-    const banner = {
-      ...bannerData,
-      ...data,
-      component_type: "Banner",
-    };
     try {
+      const banner = {
+        ...bannerData,
+        ...data,
+        component_type: "Banner",
+        timestampe: serverTimestamp(),
+      };
       const docRef = await addDoc(collection(firestore, "widgets"), banner);
       toast.success("Banner added successfully ", {
         duration: 1500,
@@ -82,6 +83,8 @@ const BannerForm = ({ onClose }: IProps) => {
         },
       });
     } catch (error) {
+      console.log(error);
+
       toast.error("Someting went wrong", {
         duration: 4000,
         position: "top-center",

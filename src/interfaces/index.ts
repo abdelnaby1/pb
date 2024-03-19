@@ -66,3 +66,14 @@ export interface IFireBaseBanner{
     typeId: number;
     refId: number | null
 }
+
+export interface IWidget{
+    name_en:string;
+    name_ar:string
+    component_type: string;
+    url_en?: string;
+    url_ar?: string;
+    ref_type?: string;
+    refId?: number
+    timestamp:string
+}

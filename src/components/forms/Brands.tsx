@@ -7,7 +7,7 @@ import { BRANDS_FORM } from "../../data";
 import InputErrorMesaage from "../InputErrorMesaage";
 import { addBrandSchema } from "../../validation";
 import toast from "react-hot-toast";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { firestore } from "../../firebase/config";
 
 const storageKey = "loggedInUser";
@@ -35,6 +35,7 @@ const BrandsForm = ({ onClose }: IProps) => {
       const docRef = await addDoc(collection(firestore, "widgets"), {
         ...data,
         component_type: "Brands",
+        timestampe: serverTimestamp(),
       });
       toast.success("Brands Widget added successfully ", {
         duration: 1500,

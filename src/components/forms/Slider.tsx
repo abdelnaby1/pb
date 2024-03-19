@@ -11,7 +11,7 @@ import InputErrorMesaage from "../InputErrorMesaage";
 import Button from "../UI/Button";
 import Input from "../UI/Input";
 import Select from "../UI/Select";
-import { addDoc, collection } from "firebase/firestore";
+import { serverTimestamp } from "firebase/firestore";
 
 const storageKey = "loggedInUser";
 const userDataString = localStorage.getItem(storageKey);
@@ -63,15 +63,23 @@ const SliderForm = ({ onClose }: IProps) => {
     setIsLoading(true);
     setBannerData((prev) => ({ ...prev, ...data }));
 
-    //need to enhance
-    const banner = {
-      ...bannerData,
-      ...data,
-      component_type: "Slider",
-    };
     try {
+      //need to enhance
+
+      const banner = {
+        ...bannerData,
+        ...data,
+      };
       const sliderRef = doc(firestore, "widgets", `slieder-${data.name_en}`);
-      await setDoc(sliderRef, { data: arrayUnion(banner) }, { merge: true });
+      await setDoc(
+        sliderRef,
+        {
+          data: arrayUnion(banner),
+          timestampe: serverTimestamp(),
+          component_type: "Slider",
+        },
+        { merge: true }
+      );
       toast.success("Slider added successfully ", {
         duration: 1500,
         position: "top-center",
@@ -82,6 +90,7 @@ const SliderForm = ({ onClose }: IProps) => {
         },
       });
     } catch (error) {
+      console.log(error);
       toast.error("Someting went wrong", {
         duration: 4000,
         position: "top-center",

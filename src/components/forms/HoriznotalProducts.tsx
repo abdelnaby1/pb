@@ -4,7 +4,7 @@ import InputErrorMesaage from "../InputErrorMesaage";
 import Input from "../UI/Input";
 import { PRODUCTS_FORM } from "../../data";
 import toast from "react-hot-toast";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { firestore } from "../../firebase/config";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -36,6 +36,7 @@ const HoriznotalProducts = ({ onClose }: IProps) => {
       const docRef = await addDoc(collection(firestore, "widgets"), {
         ...data,
         component_type: "Horiznotal_Products",
+        timestampe: serverTimestamp(),
       });
       toast.success("Horiznotal Products Widget added successfully ", {
         duration: 1500,
