@@ -43,7 +43,7 @@ export const Modal = ({isOpen, closeModal, title, children,description}: IProps)
                 <Dialog.Panel className="w-full max-w-xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                   {title && <Dialog.Title
                     as="h3"
-                    className="text-lg font-medium leading-6 text-gray-900"
+                    className="text-lg text-center font-medium leading-6 text-gray-900"
                 >
                     {title}
                 </Dialog.Title>}
