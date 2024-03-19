@@ -1,4 +1,4 @@
-import { IBanner, IBannerInput, IBrandInput, ILoginInput, IProductsInput } from "../interfaces";
+import { IBanner, IBannerInput, IBrandInput, ILoginInput, IProductsInput, ISLIDERInput } from "../interfaces";
 
 export const bannerTypes: IBanner[] = [
    {
@@ -31,6 +31,21 @@ export const LOGIN_FORM: ILoginInput[] = [
     },
 ]
 export const BANNER_FORM: IBannerInput[] = [
+    {
+      name: 'name_en',
+      placeholder: 'Name in English',
+      type: 'string',
+      validation: { required: true}
+    },
+    {
+      name: 'name_ar',
+      placeholder: 'Name in Arabic',
+      type: 'string',
+      validation: { required: true}
+    },
+]
+
+export const SLIDER_FORM: ISLIDERInput[] = [
     {
       name: 'name_en',
       placeholder: 'Name in English',

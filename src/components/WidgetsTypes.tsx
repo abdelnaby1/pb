@@ -5,7 +5,7 @@ interface IProps{
 
 const WidgetsTypes = ({setWidgetType}:IProps) => {
   return (
-    <div className='flex items-center justify-center space-x-2'>
+    <div className='grid grid-cols-2 gap-1 md:flex items-center justify-between'>
         <p className='bg-slate-400 rounded-md p-1 cursor-pointer' onClick={setWidgetType}>Banner</p>
         <p className='bg-slate-400 rounded-md p-1 cursor-pointer' onClick={setWidgetType}>Slider</p>
         <p className='bg-slate-400 rounded-md p-1 cursor-pointer' onClick={setWidgetType}>Brands</p>

@@ -19,7 +19,7 @@ interface Types{
 const WidgetForm = ({type,onCloseModal}: IProps) => {
   const widgetTypeForm: Types = {
   Banner: <BannerForm onClose={onCloseModal}/>,
-  Slider: <SliderForm />,
+  Slider: <SliderForm onClose={onCloseModal}/>,
   Brands: <BrandsForm onClose={onCloseModal} />,
   ["Horiznotal Products"]: <HoriznotalProductsForm  onClose={onCloseModal} />,
   ["Vertical Products"]: <VerticalProductsForm  onClose={onCloseModal} />,
