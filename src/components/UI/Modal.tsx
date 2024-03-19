@@ -1,17 +1,20 @@
-import { Dialog, Transition } from '@headlessui/react'
-import { Fragment, ReactNode } from 'react'
-interface IProps{
-    isOpen: boolean;
-    closeModal: () => void;
-    title: string;
-    children: ReactNode
-    description?: string
-
+import { Dialog, Transition } from "@headlessui/react";
+import { Fragment, ReactNode } from "react";
+interface IProps {
+  isOpen: boolean;
+  closeModal: () => void;
+  title: string;
+  children: ReactNode;
+  description?: string;
 }
 
-export const Modal = ({isOpen, closeModal, title, children,description}: IProps) => {
-
-
+export const Modal = ({
+  isOpen,
+  closeModal,
+  title,
+  children,
+  description,
+}: IProps) => {
   return (
     <>
       <Transition appear show={isOpen} as={Fragment}>
@@ -41,21 +44,20 @@ export const Modal = ({isOpen, closeModal, title, children,description}: IProps)
                 leaveTo="opacity-0 scale-95"
               >
                 <Dialog.Panel className="w-full max-w-xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                  {title && <Dialog.Title
-                    as="h3"
-                    className="text-lg text-center font-medium leading-6 text-gray-900"
-                >
-                    {title}
-                </Dialog.Title>}
-                {description && <div className="mt-2">
-                    <p className="text-sm text-gray-500">
-                     {description}
-                    </p>
-                  </div>
-                }
-                <div className="mt-4">
-                    {children}
-                </div>
+                  {title && (
+                    <Dialog.Title
+                      as="h3"
+                      className="text-lg text-center font-medium leading-6 text-gray-900"
+                    >
+                      {title}
+                    </Dialog.Title>
+                  )}
+                  {description && (
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-500">{description}</p>
+                    </div>
+                  )}
+                  <div className="mt-4">{children}</div>
                 </Dialog.Panel>
               </Transition.Child>
             </div>
@@ -63,5 +65,5 @@ export const Modal = ({isOpen, closeModal, title, children,description}: IProps)
         </Dialog>
       </Transition>
     </>
-  )
-}
+  );
+};
