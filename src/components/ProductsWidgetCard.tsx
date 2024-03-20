@@ -1,18 +1,13 @@
-import React from "react";
 import { IProductsWidget } from "../interfaces";
 import Button from "./UI/Button";
 interface IProps {
   widget: IProductsWidget;
-  //   openEditModal: () => void;
-  //   setProductToEditIdx: (value: number) => void;
-  //   idx: number;
-  //   openDeleteModal: () => void;
+  openDeleteModal: (id: string) => void;
 }
-const ProductsWidgetCard = ({ widget }: IProps) => {
+const ProductsWidgetCard = ({ widget, openDeleteModal }: IProps) => {
   const { name_en, name_ar, component_type, cat_id } = widget;
   const onRemove = () => {
-    // openDeleteModal();
-    // setProductToEditIdx(idx);
+    openDeleteModal(widget.id);
   };
   return (
     <div className=" mx-auto md:mx-0 border rounded-md p-2 flex flex-col">

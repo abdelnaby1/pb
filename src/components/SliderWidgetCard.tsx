@@ -1,4 +1,4 @@
-import { IBannerWidget } from "../interfaces";
+import { IBannerWidget, ISliderWidget } from "../interfaces";
 import Button from "./UI/Button";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
@@ -7,26 +7,32 @@ import "../App.css";
 import { Navigation } from "swiper/modules";
 import Image from "./UI/Image";
 interface IProps {
-  widget: IBannerWidget;
-  openDeleteModal: (id: string) => void;
+  widget: ISliderWidget;
+  //   openEditModal: () => void;
+  //   setProductToEditIdx: (value: number) => void;
+  //   idx: number;
+  //   openDeleteModal: () => void;
 }
-const BannerWidgetCard = ({ widget, openDeleteModal }: IProps) => {
-  const { name_en, name_ar, component_type, url_en, url_ar, ref_type } = widget;
+const SliderWidgetCard = ({ widget }: IProps) => {
+  const { component_type, data } = widget;
   const onRemove = () => {
-    openDeleteModal(widget.id);
+    // openDeleteModal();
+    // setProductToEditIdx(idx);
   };
   return (
     <div className="max-h-fit mx-auto md:mx-0 border rounded-md p-2 flex flex-col">
-      <Swiper navigation={true} modules={[Navigation]} className="mySwiper">
-        <SwiperSlide>
-          <Image imageUrl={url_en} alt={component_type} />
-        </SwiperSlide>
-        <SwiperSlide>
-          {" "}
-          <Image imageUrl={url_ar} alt={component_type} />
-        </SwiperSlide>
-      </Swiper>
-      <h3>
+      {data.map((slider) => (
+        <Swiper navigation={true} modules={[Navigation]} className="mySwiper">
+          <SwiperSlide>
+            <Image imageUrl={slider.url_en} alt={component_type} />
+          </SwiperSlide>
+          <SwiperSlide>
+            <Image imageUrl={slider.url_ar} alt={component_type} />
+          </SwiperSlide>
+        </Swiper>
+      ))}
+
+      {/* <h3>
         Widget Type:{" "}
         <span className="text-red-950 textbo font-bold">{component_type}</span>
       </h3>
@@ -41,7 +47,7 @@ const BannerWidgetCard = ({ widget, openDeleteModal }: IProps) => {
       <h3>
         Reference Type:{" "}
         <span className="text-red-950 textbo font-bold">{ref_type}</span>
-      </h3>
+      </h3> */}
 
       <div className="flex items-center justify-between space-x-2">
         <Button variant={"danger"} fullWidth onClick={onRemove}>
@@ -52,4 +58,4 @@ const BannerWidgetCard = ({ widget, openDeleteModal }: IProps) => {
   );
 };
 
-export default BannerWidgetCard;
+export default SliderWidgetCard;
