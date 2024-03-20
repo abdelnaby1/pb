@@ -51,3 +51,27 @@ export const removeBannerFromStorage = async (url:string) => {
           )   
       }
 }
+
+export const removeSliderrFromStorage = async (urls:string[]) => {
+      try {
+        urls.forEach(async (url) => {
+        const imgRef = ref(storage,url)
+        await deleteObject(imgRef)   
+        })
+
+    
+      } catch (error) {
+        console.log(error);
+          const errorObj = error as FirebaseError      
+          toast.error(`${errorObj.message}`, {
+              duration: 4000,
+              position: 'top-center',
+              style: {
+                backgroundColor: "black",
+                color: "white",
+                width: "fit-content",
+              }
+            }
+          )   
+      }
+}

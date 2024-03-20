@@ -1,4 +1,4 @@
-import { IBannerWidget, ISliderWidget } from "../interfaces";
+import { ISliderWidget } from "../interfaces";
 import Button from "./UI/Button";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
@@ -6,23 +6,26 @@ import "swiper/css/navigation";
 import "../App.css";
 import { Navigation } from "swiper/modules";
 import Image from "./UI/Image";
+
 interface IProps {
   widget: ISliderWidget;
-  //   openEditModal: () => void;
-  //   setProductToEditIdx: (value: number) => void;
-  //   idx: number;
-  //   openDeleteModal: () => void;
+  openDeleteModal: (id: string) => void;
 }
-const SliderWidgetCard = ({ widget }: IProps) => {
+const SliderWidgetCard = ({ widget, openDeleteModal }: IProps) => {
   const { component_type, data } = widget;
   const onRemove = () => {
-    // openDeleteModal();
-    // setProductToEditIdx(idx);
+    openDeleteModal(widget.id);
   };
+
   return (
     <div className="max-h-fit mx-auto md:mx-0 border rounded-md p-2 flex flex-col">
       {data.map((slider) => (
-        <Swiper navigation={true} modules={[Navigation]} className="mySwiper">
+        <Swiper
+          key={slider.name_en}
+          navigation={true}
+          modules={[Navigation]}
+          className="mySwiper"
+        >
           <SwiperSlide>
             <Image imageUrl={slider.url_en} alt={component_type} />
           </SwiperSlide>

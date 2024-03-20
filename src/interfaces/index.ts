@@ -112,6 +112,7 @@ export interface ISingleSliderWidget{
     refId?:string
 }
 export interface ISliderWidget{
+    id:string;
     data: ISingleSliderWidget[]
     component_type:string
     timestamp?:string

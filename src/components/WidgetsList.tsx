@@ -15,14 +15,18 @@ import {
   IBannerWidget,
   IBrandsWidget,
   IProductsWidget,
-  // ISliderWidget,
+  ISingleSliderWidget,
+  ISliderWidget,
 } from "../interfaces";
 import BannerWidgetCard from "./BannerWidgetCard";
-// import SliderWidgetCard from "./SliderWidgetCard";
+import SliderWidgetCard from "./SliderWidgetCard";
 import Button from "./UI/Button";
 import { Modal } from "./UI/Modal";
 import toast from "react-hot-toast";
-import { removeBannerFromStorage } from "../firebase/functions";
+import {
+  removeBannerFromStorage,
+  removeSliderrFromStorage,
+} from "../firebase/functions";
 
 const WidgetsList = () => {
   const [widgets, setWidgets] = useState<{ id: string; data: DocumentData }[]>(
@@ -73,6 +77,19 @@ const WidgetsList = () => {
         await removeBannerFromStorage(widgetToDelete.data.url_ar);
         await deleteDoc(doc(firestore, "widgets", widgetToDeleteId));
         setWidgets(updatedWidgets);
+      } else if (
+        widgetToDeleteId &&
+        widgetToDelete?.data.component_type === "Slider"
+      ) {
+        //deleteing images
+        const urls: string[] = [];
+        widgetToDelete.data.data.map((w: ISingleSliderWidget) => {
+          urls.push(w.url_en);
+          urls.push(w.url_ar);
+        });
+        await removeSliderrFromStorage(urls);
+        await deleteDoc(doc(firestore, "widgets", widgetToDeleteId));
+        setWidgets(updatedWidgets);
       } else if (widgetToDeleteId) {
         await deleteDoc(doc(firestore, "widgets", widgetToDeleteId));
         setWidgets(updatedWidgets);
@@ -102,6 +119,8 @@ const WidgetsList = () => {
       onCloseDeleteModal();
     }
   };
+  console.log(widgets);
+
   useEffect(() => {
     getWidgets();
   }, []);
@@ -156,13 +175,20 @@ const WidgetsList = () => {
         />
       );
     }
-    // if (widget.data.component_type.includes("Slider")) {
-    //   const sliderWidget: ISliderWidget = {
-    //     component_type: widget.data.component_type,
-    //     data: widget.data.data,
-    //   };
-    //   return <SliderWidgetCard key={widget.id} widget={sliderWidget} />;
-    // }
+    if (widget.data.component_type.includes("Slider")) {
+      const sliderWidget: ISliderWidget = {
+        id: widget.id,
+        component_type: widget.data.component_type,
+        data: widget.data.data,
+      };
+      return (
+        <SliderWidgetCard
+          openDeleteModal={() => onOpenDeleteModal(widget.id)}
+          key={widget.id}
+          widget={sliderWidget}
+        />
+      );
+    }
   });
 
   return (
