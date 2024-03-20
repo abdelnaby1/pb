@@ -61,7 +61,9 @@ const HomePage = () => {
           <WidgetForm onCloseModal={onCloseAddModal} type={widgetType} />
         </Modal>
       </section>
-      <WidgetsList />
+      <section className="w-full">
+        <WidgetsList />
+      </section>
     </>
   );
 };

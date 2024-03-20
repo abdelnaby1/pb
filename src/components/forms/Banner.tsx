@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import Select from "../UI/Select";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { firestore } from "../../firebase/config";
+import { v4 as uuid } from "uuid";
 
 const storageKey = "loggedInUser";
 const userDataString = localStorage.getItem(storageKey);
@@ -69,6 +70,7 @@ const BannerForm = ({ onClose }: IProps) => {
       const banner = {
         ...bannerData,
         ...data,
+        id: uuid() + Date.now(),
         component_type: "Banner",
         timestampe: serverTimestamp(),
       };

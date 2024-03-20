@@ -77,3 +77,26 @@ export interface IWidget{
     refId?: number
     timestamp:string
 }
+export interface IProductsWidget{
+    name_en:string;
+    name_ar:string;
+    component_type:string
+    cat_id: string;
+    timestamp?:string
+}
+export interface IBrandsWidget{
+    name_en:string;
+    name_ar:string;
+    component_type:string
+    timestamp?:string
+}
+export interface IBannerWidget{
+    name_en:string;
+    name_ar:string;
+    url_en:string;
+    url_ar:string;
+    ref_type:string
+    refId?:string
+    component_type:string
+    timestamp?:string
+}

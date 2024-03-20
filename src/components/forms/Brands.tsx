@@ -9,6 +9,7 @@ import { addBrandSchema } from "../../validation";
 import toast from "react-hot-toast";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { firestore } from "../../firebase/config";
+import { v4 as uuid } from "uuid";
 
 const storageKey = "loggedInUser";
 const userDataString = localStorage.getItem(storageKey);
@@ -35,6 +36,7 @@ const BrandsForm = ({ onClose }: IProps) => {
       const docRef = await addDoc(collection(firestore, "widgets"), {
         ...data,
         component_type: "Brands",
+        id: uuid() + Date.now(),
         timestampe: serverTimestamp(),
       });
       toast.success("Brands Widget added successfully ", {

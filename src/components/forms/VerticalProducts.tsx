@@ -9,6 +9,7 @@ import InputErrorMesaage from "../InputErrorMesaage";
 import toast from "react-hot-toast";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { firestore } from "../../firebase/config";
+import { v4 as uuid } from "uuid";
 
 const storageKey = "loggedInUser";
 const userDataString = localStorage.getItem(storageKey);
@@ -36,6 +37,7 @@ const VerticalProductsForm = ({ onClose }: IProps) => {
       const docRef = await addDoc(collection(firestore, "widgets"), {
         ...data,
         component_type: "Vertical_Products",
+        id: uuid() + Date.now(),
         timestampe: serverTimestamp(),
       });
       toast.success("Vertical Products Widget added successfully ", {

@@ -9,6 +9,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { firestore } from "../../firebase/config";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { addProductsSchema } from "../../validation";
+import { v4 as uuid } from "uuid";
 
 const storageKey = "loggedInUser";
 const userDataString = localStorage.getItem(storageKey);
@@ -36,6 +37,7 @@ const HoriznotalProducts = ({ onClose }: IProps) => {
       const docRef = await addDoc(collection(firestore, "widgets"), {
         ...data,
         component_type: "Horiznotal_Products",
+        id: uuid() + Date.now(),
         timestampe: serverTimestamp(),
       });
       toast.success("Horiznotal Products Widget added successfully ", {

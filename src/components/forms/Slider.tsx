@@ -12,6 +12,7 @@ import Button from "../UI/Button";
 import Input from "../UI/Input";
 import Select from "../UI/Select";
 import { serverTimestamp } from "firebase/firestore";
+import { v4 as uuid } from "uuid";
 
 const storageKey = "loggedInUser";
 const userDataString = localStorage.getItem(storageKey);
@@ -77,6 +78,7 @@ const SliderForm = ({ onClose }: IProps) => {
           data: arrayUnion(banner),
           timestampe: serverTimestamp(),
           component_type: "Slider",
+          id: uuid() + Date.now(),
         },
         { merge: true }
       );
