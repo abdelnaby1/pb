@@ -119,7 +119,6 @@ const WidgetsList = () => {
       onCloseDeleteModal();
     }
   };
-  console.log(widgets);
 
   useEffect(() => {
     getWidgets();
