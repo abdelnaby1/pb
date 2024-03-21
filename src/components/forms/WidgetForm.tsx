@@ -6,6 +6,8 @@ import VerticalProductsForm from "./VerticalProducts";
 interface IProps {
   type: string;
   onCloseModal: () => void;
+  sliderAction?: "Add" | "Update";
+  sliderId?: string;
 }
 interface Types {
   [Banner: string]: JSX.Element;
@@ -15,10 +17,21 @@ interface Types {
   ["Vertical Products"]: JSX.Element;
 }
 
-const WidgetForm = ({ type, onCloseModal }: IProps) => {
+const WidgetForm = ({
+  type,
+  onCloseModal,
+  sliderAction = "Add",
+  sliderId,
+}: IProps) => {
   const widgetTypeForm: Types = {
     Banner: <BannerForm onClose={onCloseModal} />,
-    Slider: <SliderForm onClose={onCloseModal} />,
+    Slider: (
+      <SliderForm
+        sliderAction={sliderAction}
+        sliderId={sliderId}
+        onClose={onCloseModal}
+      />
+    ),
     Brands: <BrandsForm onClose={onCloseModal} />,
     ["Horiznotal Products"]: <HoriznotalProductsForm onClose={onCloseModal} />,
     ["Vertical Products"]: <VerticalProductsForm onClose={onCloseModal} />,

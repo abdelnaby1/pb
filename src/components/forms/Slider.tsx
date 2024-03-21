@@ -19,6 +19,8 @@ const userDataString = localStorage.getItem(storageKey);
 const userData = userDataString ? JSON.parse(userDataString) : null;
 interface IProps {
   onClose: () => void;
+  sliderAction?: "Add" | "Update";
+  sliderId?: string;
 }
 interface IImgInput {
   [banner_img_en: string]: File;
@@ -39,7 +41,7 @@ const defaultBanner: ISlider = {
   url_ar: "",
   ref_type: "",
 };
-const SliderForm = ({ onClose }: IProps) => {
+const SliderForm = ({ onClose, sliderAction, sliderId }: IProps) => {
   const [bannerData, setBannerData] = useState(defaultBanner);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [bannerImgs, setBannerImgs] = useState<IImgInput>(null);
@@ -71,7 +73,14 @@ const SliderForm = ({ onClose }: IProps) => {
         ...bannerData,
         ...data,
       };
-      const sliderRef = doc(firestore, "widgets", `slieder-${data.name_en}`);
+
+      const sliderDocName =
+        sliderAction == "Update" && sliderId
+          ? sliderId
+          : `slieder-${Date.now() + data.name_en}`;
+
+      const sliderRef = doc(firestore, "widgets", sliderDocName);
+
       await setDoc(
         sliderRef,
         {
