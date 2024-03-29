@@ -9,12 +9,16 @@ import Input from "../UI/Input";
 import { uploadBannerToStorage } from "../../firebase/functions";
 import toast from "react-hot-toast";
 import Select from "../UI/Select";
-import { addDoc, collection } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+} from "firebase/firestore";
 import { firestore } from "../../firebase/config";
-
-const storageKey = "loggedInUser";
-const userDataString = localStorage.getItem(storageKey);
-const userData = userDataString ? JSON.parse(userDataString) : null;
+import { v4 as uuid } from "uuid";
 
 interface IProps {
   onClose: () => void;
@@ -61,17 +65,27 @@ const BannerForm = ({ onClose }: IProps) => {
   });
 
   const onBannerSubmit: SubmitHandler<IBanner> = async (data) => {
-    setIsLoading(true);
-    setBannerData((prev) => ({ ...prev, ...data }));
-
-    //need to enhance
-    const banner = {
-      ...bannerData,
-      ...data,
-      component_type: "Banner",
-    };
     try {
-      const docRef = await addDoc(collection(firestore, "widgets"), banner);
+      setIsLoading(true);
+      setBannerData((prev) => ({ ...prev, ...data }));
+      const widgetsRef = collection(firestore, "widgets");
+      const querySnapshot = await getDocs(
+        query(widgetsRef, orderBy("order", "desc"), limit(1))
+      );
+      let nextOrder = 1;
+
+      if (!querySnapshot.empty) {
+        const lastWidget = querySnapshot.docs[0].data();
+        nextOrder = lastWidget.order + 1;
+      }
+      const banner = {
+        ...bannerData,
+        ...data,
+        id: uuid() + Date.now(),
+        component_type: "Banner",
+        order: nextOrder,
+      };
+      await addDoc(collection(firestore, "widgets"), banner);
       toast.success("Banner added successfully ", {
         duration: 1500,
         position: "top-center",
@@ -82,6 +96,8 @@ const BannerForm = ({ onClose }: IProps) => {
         },
       });
     } catch (error) {
+      console.log(error);
+
       toast.error("Someting went wrong", {
         duration: 4000,
         position: "top-center",

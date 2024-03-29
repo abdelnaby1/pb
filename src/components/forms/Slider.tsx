@@ -11,13 +11,20 @@ import InputErrorMesaage from "../InputErrorMesaage";
 import Button from "../UI/Button";
 import Input from "../UI/Input";
 import Select from "../UI/Select";
-import { addDoc, collection } from "firebase/firestore";
+import {
+  FieldValue,
+  collection,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+} from "firebase/firestore";
+import { v4 as uuid } from "uuid";
 
-const storageKey = "loggedInUser";
-const userDataString = localStorage.getItem(storageKey);
-const userData = userDataString ? JSON.parse(userDataString) : null;
 interface IProps {
   onClose: () => void;
+  sliderAction?: "Add" | "Update";
+  sliderId?: string;
 }
 interface IImgInput {
   [banner_img_en: string]: File;
@@ -38,7 +45,7 @@ const defaultBanner: ISlider = {
   url_ar: "",
   ref_type: "",
 };
-const SliderForm = ({ onClose }: IProps) => {
+const SliderForm = ({ onClose, sliderAction, sliderId }: IProps) => {
   const [bannerData, setBannerData] = useState(defaultBanner);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [bannerImgs, setBannerImgs] = useState<IImgInput>(null);
@@ -60,18 +67,44 @@ const SliderForm = ({ onClose }: IProps) => {
   });
 
   const onBannerSubmit: SubmitHandler<ISlider> = async (data) => {
-    setIsLoading(true);
-    setBannerData((prev) => ({ ...prev, ...data }));
-
-    //need to enhance
-    const banner = {
-      ...bannerData,
-      ...data,
-      component_type: "Slider",
-    };
     try {
-      const sliderRef = doc(firestore, "widgets", `slieder-${data.name_en}`);
-      await setDoc(sliderRef, { data: arrayUnion(banner) }, { merge: true });
+      setIsLoading(true);
+      setBannerData((prev) => ({ ...prev, ...data }));
+      const widgetsRef = collection(firestore, "widgets");
+      const querySnapshot = await getDocs(
+        query(widgetsRef, orderBy("order", "desc"), limit(1))
+      );
+      let nextOrder = 1;
+
+      if (!querySnapshot.empty) {
+        const lastWidget = querySnapshot.docs[0].data();
+        nextOrder = lastWidget.order + 1;
+      }
+      const banner = {
+        ...bannerData,
+        ...data,
+      };
+
+      const sliderDocName =
+        sliderAction == "Update" && sliderId
+          ? sliderId
+          : `slieder-${Date.now() + data.name_en}`;
+
+      const sliderRef = doc(firestore, "widgets", sliderDocName);
+      const docData: {
+        data: FieldValue;
+        component_type: string;
+        id: string;
+        order?: number;
+      } = {
+        data: arrayUnion(banner),
+        component_type: "Slider",
+        id: uuid() + Date.now(),
+      };
+      if (!sliderRef.id) {
+        docData.order = nextOrder;
+      }
+      await setDoc(sliderRef, docData, { merge: true });
       toast.success("Slider added successfully ", {
         duration: 1500,
         position: "top-center",
@@ -82,6 +115,7 @@ const SliderForm = ({ onClose }: IProps) => {
         },
       });
     } catch (error) {
+      console.log(error);
       toast.error("Someting went wrong", {
         duration: 4000,
         position: "top-center",
