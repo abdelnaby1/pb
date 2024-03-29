@@ -1,11 +1,14 @@
-import { IProductsWidget } from "../interfaces";
+import { IWidget } from "../interfaces";
 import Button from "./UI/Button";
 interface IProps {
-  widget: IProductsWidget;
+  widget: IWidget;
   openDeleteModal: (id: string) => void;
 }
 const ProductsWidgetCard = ({ widget, openDeleteModal }: IProps) => {
-  const { name_en, name_ar, component_type, cat_id } = widget;
+  const {
+    component_type,
+    widgetData: { name_en, name_ar, products_ids, cat_id },
+  } = widget;
   const onRemove = () => {
     openDeleteModal(widget.id);
   };
@@ -25,10 +28,24 @@ const ProductsWidgetCard = ({ widget, openDeleteModal }: IProps) => {
         Name in Arabic:{" "}
         <span className="text-red-950 textbo font-bold">{name_ar}</span>
       </h3>
-      <h3>
-        Products Category ID:{" "}
-        <span className="text-red-950 textbo font-bold">{cat_id}</span>
-      </h3>
+      {cat_id && (
+        <h3>
+          Products Category ID:{" "}
+          <span className="text-red-950 textbo font-bold">{cat_id}</span>
+        </h3>
+      )}
+      {products_ids && (
+        <h3>
+          Products Categories IDs:{" "}
+          <span className="text-red-950 textbo font-bold">
+            [
+            {products_ids.map((id) => (
+              <span key={id}>{`${id}, `}</span>
+            ))}
+            ]
+          </span>
+        </h3>
+      )}
 
       <div className="flex items-center justify-between space-x-2">
         <Button variant={"danger"} fullWidth onClick={onRemove}>

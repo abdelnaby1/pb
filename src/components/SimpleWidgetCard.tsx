@@ -1,11 +1,14 @@
-import { IBrandsWidget } from "../interfaces";
+import { IWidget } from "../interfaces";
 import Button from "./UI/Button";
 interface IProps {
-  widget: IBrandsWidget;
+  widget: IWidget;
   openDeleteModal: (id: string) => void;
 }
-const BrandsWidgetCard = ({ widget, openDeleteModal }: IProps) => {
-  const { name_en, name_ar, component_type } = widget;
+const SimpleWidgetCard = ({ widget, openDeleteModal }: IProps) => {
+  const {
+    component_type,
+    widgetData: { name_en, name_ar },
+  } = widget;
   const onRemove = () => {
     openDeleteModal(widget.id);
   };
@@ -33,4 +36,4 @@ const BrandsWidgetCard = ({ widget, openDeleteModal }: IProps) => {
   );
 };
 
-export default BrandsWidgetCard;
+export default SimpleWidgetCard;

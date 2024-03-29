@@ -3,11 +3,14 @@ import SliderForm from "./Slider";
 import SimpleTypeForm from "./SimpleType";
 import ProductsForm from "./Products";
 import CategoriesForm from "./Categories";
+import { IWidget } from "../../interfaces";
 interface IProps {
   type: string;
   onCloseModal: () => void;
   sliderAction?: "Add" | "Update";
   sliderId?: string;
+  setWidgets: (widgets: IWidget[]) => void;
+  widgets: IWidget[];
 }
 interface Types {
   [Banner: string]: JSX.Element;
@@ -22,9 +25,17 @@ const WidgetForm = ({
   onCloseModal,
   sliderAction = "Add",
   sliderId,
+  setWidgets,
+  widgets,
 }: IProps) => {
   const widgetTypeForm: Types = {
-    Banner: <BannerForm onClose={onCloseModal} />,
+    Banner: (
+      <BannerForm
+        onClose={onCloseModal}
+        setWidgets={setWidgets}
+        widgets={widgets}
+      />
+    ),
     Slider: (
       <SliderForm
         sliderAction={sliderAction}

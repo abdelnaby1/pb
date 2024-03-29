@@ -8,18 +8,19 @@ export const loginSchema = yup
   })
   .required()
 
-export const addBannerSchema = yup
-  .object().shape({
+export const addBannerSchema = yup.object().shape({
+  component_type: yup.string().required("Component Type required"),
+  widgetData: yup.object().shape({
     name_en: yup.string().required("Name in English required"),
     name_ar: yup.string().required("Name in Arabic required"),
-    url_en: yup.string().required("Url in Arabic required"),
-    url_ar: yup.string().required("Url in Arabic required"),
-    ref_type: yup.string().required("Reference Type is required"),
+    url_en: yup.string(),
+    url_ar: yup.string(),
+    ref_type: yup.string(),
     ref_id: yup.number()
       .typeError('Reference Id must be a number').
       positive("Reference Id must be a valid number").integer("Reference Id must be a valid Id")
-  })
-  .required()
+  }),
+}).required()
 
   export const addSliderSchema = yup
   .object().shape({

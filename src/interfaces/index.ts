@@ -67,30 +67,27 @@ export interface IFireBaseBanner{
     refId: number | null
 }
 
-export interface IWidget{
-    name_en:string;
-    name_ar:string
-    component_type: string;
-    url_en?: string;
-    url_ar?: string;
-    ref_type?: string;
-    refId?: number
-    timestamp:string
-}
+// export interface IWidget{
+//     name_en:string;
+//     name_ar:string
+//     component_type: string;
+//     url_en?: string;
+//     url_ar?: string;
+//     ref_type?: string;
+//     refId?: number
+// }
 export interface IProductsWidget{
     id:string;
     name_en:string;
     name_ar:string;
     component_type:string
     cat_id: string;
-    timestamp?:string
 }
 export interface IBrandsWidget{
     id:string;
     name_en:string;
     name_ar:string;
     component_type:string
-    timestamp?:string
 }
 export interface IBannerWidget{
     id:string;
@@ -101,7 +98,6 @@ export interface IBannerWidget{
     ref_type:string
     refId?:string
     component_type:string
-    timestamp?:string
 }
 export interface ISingleSliderWidget{
     name_en:string;
@@ -109,11 +105,25 @@ export interface ISingleSliderWidget{
     url_en:string;
     url_ar:string;
     ref_type:string
-    refId?:string
+    ref_id?:string
 }
-export interface ISliderWidget{
-    id:string;
-    data: ISingleSliderWidget[]
-    component_type:string
-    timestamp?:string
+
+
+export interface IWidgetData {
+  name_en: string;
+  name_ar: string;
+  products_ids?: string[];
+  categories_ids?: string[];
+  cat_id?: number;
+  url_en?: string;
+  url_ar?: string;
+  ref_type?: string;
+  ref_id?: number;
+  data?: ISingleSliderWidget[]
+}
+export interface IWidget {
+  id?: string;
+  component_type: string;
+  order?: number;
+  widgetData: IWidgetData;
 }
