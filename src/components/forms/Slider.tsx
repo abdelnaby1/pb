@@ -11,12 +11,16 @@ import InputErrorMesaage from "../InputErrorMesaage";
 import Button from "../UI/Button";
 import Input from "../UI/Input";
 import Select from "../UI/Select";
-import { serverTimestamp } from "firebase/firestore";
+import {
+  FieldValue,
+  collection,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+} from "firebase/firestore";
 import { v4 as uuid } from "uuid";
 
-const storageKey = "loggedInUser";
-const userDataString = localStorage.getItem(storageKey);
-const userData = userDataString ? JSON.parse(userDataString) : null;
 interface IProps {
   onClose: () => void;
   sliderAction?: "Add" | "Update";
@@ -63,12 +67,19 @@ const SliderForm = ({ onClose, sliderAction, sliderId }: IProps) => {
   });
 
   const onBannerSubmit: SubmitHandler<ISlider> = async (data) => {
-    setIsLoading(true);
-    setBannerData((prev) => ({ ...prev, ...data }));
-
     try {
-      //need to enhance
+      setIsLoading(true);
+      setBannerData((prev) => ({ ...prev, ...data }));
+      const widgetsRef = collection(firestore, "widgets");
+      const querySnapshot = await getDocs(
+        query(widgetsRef, orderBy("order", "desc"), limit(1))
+      );
+      let nextOrder = 1;
 
+      if (!querySnapshot.empty) {
+        const lastWidget = querySnapshot.docs[0].data();
+        nextOrder = lastWidget.order + 1;
+      }
       const banner = {
         ...bannerData,
         ...data,
@@ -80,17 +91,20 @@ const SliderForm = ({ onClose, sliderAction, sliderId }: IProps) => {
           : `slieder-${Date.now() + data.name_en}`;
 
       const sliderRef = doc(firestore, "widgets", sliderDocName);
-
-      await setDoc(
-        sliderRef,
-        {
-          data: arrayUnion(banner),
-          timestampe: serverTimestamp(),
-          component_type: "Slider",
-          id: uuid() + Date.now(),
-        },
-        { merge: true }
-      );
+      const docData: {
+        data: FieldValue;
+        component_type: string;
+        id: string;
+        order?: number;
+      } = {
+        data: arrayUnion(banner),
+        component_type: "Slider",
+        id: uuid() + Date.now(),
+      };
+      if (!sliderRef.id) {
+        docData.order = nextOrder;
+      }
+      await setDoc(sliderRef, docData, { merge: true });
       toast.success("Slider added successfully ", {
         duration: 1500,
         position: "top-center",

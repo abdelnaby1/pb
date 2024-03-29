@@ -36,7 +36,7 @@ const WidgetsTypes = ({ setWidgetType }: IProps) => {
         className="bg-slate-400 rounded-md p-1 cursor-pointer"
         onClick={setWidgetType}
       >
-        Vertical Products
+        Categories
       </p>
     </div>
   );

@@ -12,7 +12,7 @@ import {
 import { SubmitHandler, useForm } from "react-hook-form";
 import { firestore } from "../../firebase/config";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { addProductsSchema } from "../../validation";
+import { addCategoriesSchema } from "../../validation";
 import { v4 as uuid } from "uuid";
 import { SaveOutlined } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
@@ -27,60 +27,43 @@ import {
 
 import { capitalizeEveryWord } from "../../lib/utils";
 const types = [
-  "vertical_products_by_category_id",
-  "horizontal_products_by_category_id",
-  "vertical_products_by_products_ids",
-  "horizontal_products_by_products_ids",
+  "vertical_categories_by_categories_ids",
+  "horizontal_categories_by_categories_ids",
 ];
 interface IProps {
   onClose: () => void;
 }
-interface IProducts {
+interface ICategories {
   name_en: string;
   name_ar: string;
-  cat_id?: number;
-  products_ids?: string[];
+  categories_ids: string[];
   component_type: string;
 }
-const defaultValues: IProducts = {
+const defaultValues: ICategories = {
   name_en: "",
   name_ar: "",
   component_type: types[0],
+  categories_ids: [],
 };
-const ProductsForm = ({ onClose }: IProps) => {
+const CategoriesForm = ({ onClose }: IProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const {
     register,
     formState: { errors },
-    getValues,
     setValue,
     handleSubmit,
-    setError,
-    unregister,
-  } = useForm<IProducts>({
-    resolver: yupResolver(addProductsSchema),
+  } = useForm<ICategories>({
+    resolver: yupResolver(addCategoriesSchema),
     defaultValues: defaultValues,
   });
   const onTypeChangeHandler = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setValue("component_type", e.target.value, { shouldValidate: true });
-    if (getValues("component_type").includes("by_products_ids")) {
-      unregister("cat_id");
-    }
   };
-  const onProductsSubmit: SubmitHandler<IProducts> = async (data) => {
-    if (
-      !data.products_ids?.length &&
-      data.component_type.includes("by_products_ids")
-    ) {
-      setError("products_ids", {
-        type: "required",
-        message: "Products Ids required",
-      });
-      return;
-    }
+  const onCategoriesSubmit: SubmitHandler<ICategories> = async (data) => {
+    console.log(data);
 
     try {
       setIsLoading(true);
@@ -89,8 +72,6 @@ const ProductsForm = ({ onClose }: IProps) => {
         query(widgetsRef, orderBy("order", "desc"), limit(1))
       );
       let nextOrder = 1;
-
-      console.log(querySnapshot);
 
       if (!querySnapshot.empty) {
         const lastWidget = querySnapshot.docs[0].data();
@@ -131,66 +112,15 @@ const ProductsForm = ({ onClose }: IProps) => {
     }
   };
 
-  const renderReaminingInputs = () => {
-    if (
-      getValues("component_type") === "vertical_products_by_products_ids" ||
-      getValues("component_type") === "horizontal_products_by_products_ids"
-    ) {
-      defaultValues.products_ids = [];
-      return (
-        <Autocomplete
-          multiple
-          id="tags-filled"
-          options={defaultValues.products_ids.map((option) => option)}
-          defaultValue={defaultValues.products_ids}
-          freeSolo
-          onChange={(e, newval) => {
-            setValue("products_ids", newval);
-          }}
-          renderTags={(value: readonly string[], getTagProps) =>
-            value.map((option: string, index: number) => (
-              <Chip
-                variant="outlined"
-                label={option}
-                {...getTagProps({ index })}
-              />
-            ))
-          }
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              variant="filled"
-              label="Ids"
-              placeholder="Ids"
-            />
-          )}
-        />
-      );
-    } else if (
-      getValues("component_type") === "vertical_products_by_category_id" ||
-      getValues("component_type") === "horizontal_products_by_category_id"
-    ) {
-      return (
-        <>
-          <TextField
-            fullWidth
-            required
-            id="outlined-required"
-            label="Category ID"
-            {...register("cat_id", { required: true })}
-          />
-        </>
-      );
-    }
-  };
+  console.log("error", errors);
 
   return (
     <Box component="section" sx={{ my: 2 }}>
       <Typography variant="h5" color="text.secondry" gutterBottom>
-        Add Products Widget
+        Add Categories Widget
       </Typography>
       <Box
-        onSubmit={handleSubmit(onProductsSubmit)}
+        onSubmit={handleSubmit(onCategoriesSubmit)}
         component="form"
         sx={{
           "& .MuiTextField-root": { my: 1 },
@@ -234,12 +164,36 @@ const ProductsForm = ({ onClose }: IProps) => {
             </MenuItem>
           ))}
         </TextField>
-        {renderReaminingInputs()}
-        {errors["cat_id"] && (
-          <InputErrorMesaage msg={`${errors["cat_id"]?.message}`} />
-        )}
-        {errors["products_ids"] && (
-          <InputErrorMesaage msg={`${errors["products_ids"]?.message}`} />
+        <Autocomplete
+          multiple
+          id="tags-filled"
+          options={defaultValues.categories_ids.map((option) => option)}
+          defaultValue={defaultValues.categories_ids}
+          freeSolo
+          onChange={(e, newval) => {
+            setValue("categories_ids", newval);
+          }}
+          renderTags={(value: readonly string[], getTagProps) =>
+            value.map((option: string, index: number) => (
+              <Chip
+                variant="outlined"
+                label={option}
+                {...getTagProps({ index })}
+              />
+            ))
+          }
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              variant="filled"
+              label="Ids"
+              placeholder="Ids"
+            />
+          )}
+        />
+
+        {errors["categories_ids"] && (
+          <InputErrorMesaage msg={`${errors["categories_ids"]?.message}`} />
         )}
         <LoadingButton
           fullWidth
@@ -258,4 +212,4 @@ const ProductsForm = ({ onClose }: IProps) => {
   );
 };
 
-export default ProductsForm;
+export default CategoriesForm;

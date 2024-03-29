@@ -46,9 +46,7 @@ const WidgetsList = () => {
   const getWidgets = async () => {
     try {
       const widgetsRef = collection(firestore, "widgets");
-      const querySnapshot = await getDocs(
-        query(widgetsRef, orderBy("timestampe"))
-      );
+      const querySnapshot = await getDocs(query(widgetsRef, orderBy("order")));
 
       const arr: { id: string; data: DocumentData }[] = [];
       querySnapshot.forEach((doc) => {

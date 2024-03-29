@@ -53,3 +53,12 @@ export const addProductsSchema = yup
     products_ids: yup.array()
       })
   .required()
+
+  export const addCategoriesSchema = yup
+  .object().shape({
+    name_en: yup.string().required("Name in English required"),
+    name_ar: yup.string().required("Name in Arabic required"),
+    component_type: yup.string().required("Type required"),
+    categories_ids: yup.array().required("Categories Ids required").min(1,"Categories Ids should be at lteast includes 1 Category")
+      })
+  .required()

@@ -16,7 +16,9 @@ export const uploadBannerToStorage = async (image:File) => {
         url = await getDownloadURL(snapshot.ref);
          
       } catch (error) {
-          const errorObj = error as FirebaseError      
+          const errorObj = error as FirebaseError   
+          console.log(error);
+             
           toast.error(`${errorObj.message}`, {
               duration: 4000,
               position: 'top-center',

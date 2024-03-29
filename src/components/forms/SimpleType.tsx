@@ -4,7 +4,14 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import InputErrorMesaage from "../InputErrorMesaage";
 import { addSimpeSchema } from "../../validation";
 import toast from "react-hot-toast";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+} from "firebase/firestore";
 import { firestore } from "../../firebase/config";
 import { v4 as uuid } from "uuid";
 import { Box, MenuItem, TextField, Typography } from "@mui/material";
@@ -51,10 +58,20 @@ const SimpleTypeForm = ({ onClose }: IProps) => {
   const onSubmit: SubmitHandler<ISimpleType> = async (data) => {
     try {
       setIsLoading(true);
+      const widgetsRef = collection(firestore, "widgets");
+      const querySnapshot = await getDocs(
+        query(widgetsRef, orderBy("order", "desc"), limit(1))
+      );
+      let nextOrder = 1;
+
+      if (!querySnapshot.empty) {
+        const lastWidget = querySnapshot.docs[0].data();
+        nextOrder = lastWidget.order + 1;
+      }
       await addDoc(collection(firestore, "widgets"), {
         ...data,
         id: uuid() + Date.now(),
-        timestampe: serverTimestamp(),
+        order: nextOrder,
       });
       toast.success(
         `${capitalizeEveryWord(
