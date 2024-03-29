@@ -1,7 +1,7 @@
 import BannerForm from "./Banner";
 import SliderForm from "./Slider";
-import BrandsForm from "./Brands";
-import HoriznotalProductsForm from "./HoriznotalProducts";
+import SimpleTypeForm from "./SimpleType";
+import ProductsForm from "./Products";
 import VerticalProductsForm from "./VerticalProducts";
 interface IProps {
   type: string;
@@ -12,8 +12,8 @@ interface IProps {
 interface Types {
   [Banner: string]: JSX.Element;
   Slider: JSX.Element;
-  Brands: JSX.Element;
-  ["Horiznotal Products"]: JSX.Element;
+  Simple: JSX.Element;
+  Products: JSX.Element;
   ["Vertical Products"]: JSX.Element;
 }
 
@@ -32,8 +32,8 @@ const WidgetForm = ({
         onClose={onCloseModal}
       />
     ),
-    Brands: <BrandsForm onClose={onCloseModal} />,
-    ["Horiznotal Products"]: <HoriznotalProductsForm onClose={onCloseModal} />,
+    Simple: <SimpleTypeForm onClose={onCloseModal} />,
+    Products: <ProductsForm onClose={onCloseModal} />,
     ["Vertical Products"]: <VerticalProductsForm onClose={onCloseModal} />,
   };
   return <div>{widgetTypeForm[type]}</div>;

@@ -34,10 +34,12 @@ export const addBannerSchema = yup
   })
   .required()
 
-  export const addBrandSchema = yup
+  export const addSimpeSchema = yup
   .object().shape({
     name_en: yup.string().required("Name in English required"),
     name_ar: yup.string().required("Name in Arabic required"),
+    component_type: yup.string().required("Type required"),
+
   })
   .required()
 
@@ -45,8 +47,9 @@ export const addProductsSchema = yup
   .object().shape({
     name_en: yup.string().required("Name in English required"),
     name_ar: yup.string().required("Name in Arabic required"),
-    cat_id: yup.number().required("Category ID is required").typeError('Reference Id must be a number')
-        .positive("Reference Id must be a valid number").integer("Reference Id must be a valid Id")
-
-  })
+    component_type: yup.string().required("Type required"),
+    cat_id: yup.number().optional().typeError('Category Id must be a number')
+        .positive("Reference Id must be a valid number").integer("Reference Id must be a valid Id"),
+    products_ids: yup.array()
+      })
   .required()

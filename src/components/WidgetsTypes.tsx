@@ -24,13 +24,13 @@ const WidgetsTypes = ({ setWidgetType }: IProps) => {
         className="bg-slate-400 rounded-md p-1 cursor-pointer"
         onClick={setWidgetType}
       >
-        Brands
+        Simple
       </p>
       <p
         className="bg-slate-400 rounded-md p-1 cursor-pointer"
         onClick={setWidgetType}
       >
-        Horiznotal Products
+        Products
       </p>
       <p
         className="bg-slate-400 rounded-md p-1 cursor-pointer"
