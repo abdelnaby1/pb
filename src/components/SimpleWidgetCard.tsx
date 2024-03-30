@@ -10,7 +10,7 @@ const SimpleWidgetCard = ({ widget, openDeleteModal }: IProps) => {
     widgetData: { name_en, name_ar },
   } = widget;
   const onRemove = () => {
-    openDeleteModal(widget.id);
+    openDeleteModal(widget.id!);
   };
   return (
     <div className="mx-auto md:mx-0 border rounded-md p-2 flex flex-col">

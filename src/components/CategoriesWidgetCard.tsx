@@ -4,10 +4,10 @@ interface IProps {
   widget: IWidget;
   openDeleteModal: (id: string) => void;
 }
-const ProductsWidgetCard = ({ widget, openDeleteModal }: IProps) => {
+const CategoriesWidgetCard = ({ widget, openDeleteModal }: IProps) => {
   const {
     component_type,
-    widgetData: { name_en, name_ar, products_ids, cat_id },
+    widgetData: { name_en, name_ar, categories_ids },
   } = widget;
   const onRemove = () => {
     openDeleteModal(widget.id!);
@@ -28,19 +28,13 @@ const ProductsWidgetCard = ({ widget, openDeleteModal }: IProps) => {
         Name in Arabic:{" "}
         <span className="text-red-950 textbo font-bold">{name_ar}</span>
       </h3>
-      {cat_id && (
+      {categories_ids && (
         <h3>
-          Products Category ID:{" "}
-          <span className="text-red-950 textbo font-bold">{cat_id}</span>
-        </h3>
-      )}
-      {products_ids && products_ids.length && (
-        <h3>
-          ProductsIDs:{" "}
+          Categories IDs:{" "}
           <span className="text-red-950 textbo font-bold">
             [
-            {products_ids.map((id, idx) => {
-              return idx === products_ids.length - 1 ? (
+            {categories_ids.map((id, idx) => {
+              return idx === categories_ids.length - 1 ? (
                 <span key={id}>{`${id}`}</span>
               ) : (
                 <span key={id}>{`${id}, `}</span>
@@ -60,4 +54,4 @@ const ProductsWidgetCard = ({ widget, openDeleteModal }: IProps) => {
   );
 };
 
-export default ProductsWidgetCard;
+export default CategoriesWidgetCard;

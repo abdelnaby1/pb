@@ -43,9 +43,27 @@ const WidgetForm = ({
         onClose={onCloseModal}
       />
     ),
-    Simple: <SimpleTypeForm onClose={onCloseModal} />,
-    Products: <ProductsForm onClose={onCloseModal} />,
-    Categories: <CategoriesForm onClose={onCloseModal} />,
+    Simple: (
+      <SimpleTypeForm
+        onClose={onCloseModal}
+        setWidgets={setWidgets}
+        widgets={widgets}
+      />
+    ),
+    Products: (
+      <ProductsForm
+        onClose={onCloseModal}
+        setWidgets={setWidgets}
+        widgets={widgets}
+      />
+    ),
+    Categories: (
+      <CategoriesForm
+        onClose={onCloseModal}
+        setWidgets={setWidgets}
+        widgets={widgets}
+      />
+    ),
   };
   return <div>{widgetTypeForm[type]}</div>;
 };

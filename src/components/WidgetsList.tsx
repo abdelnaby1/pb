@@ -8,7 +8,6 @@ import {
 } from "firebase/firestore";
 import { firestore } from "../firebase/config";
 import { useEffect, useState } from "react";
-import BrandsWidgetCard from "./SimpleWidgetCard";
 import ProductsWidgetCard from "./ProductsWidgetCard";
 import { ISingleSliderWidget, IWidget } from "../interfaces";
 import BannerWidgetCard from "./BannerWidgetCard";
@@ -20,6 +19,8 @@ import {
   removeBannerFromStorage,
   removeSliderrFromStorage,
 } from "../firebase/functions";
+import CategoriesWidgetCard from "./CategoriesWidgetCard";
+import SimpleWidgetCard from "./SimpleWidgetCard";
 
 interface IProps {
   widgets: IWidget[];
@@ -121,13 +122,13 @@ const WidgetsList = ({ widgets, setWidgets }: IProps) => {
       widget.component_type.includes("sale")
     ) {
       return (
-        <BrandsWidgetCard
+        <SimpleWidgetCard
           openDeleteModal={() => onOpenDeleteModal(widget.id!)}
           key={widget.id!}
           widget={widget}
         />
       );
-    } else if (widget.component_type.includes("products")) {
+    } else if (widget.component_type.includes("products_by")) {
       return (
         <ProductsWidgetCard
           openDeleteModal={() => onOpenDeleteModal(widget.id!)}
@@ -135,10 +136,16 @@ const WidgetsList = ({ widgets, setWidgets }: IProps) => {
           widget={widget}
         />
       );
+    } else if (widget.component_type.includes("categories_by")) {
+      return (
+        <CategoriesWidgetCard
+          openDeleteModal={() => onOpenDeleteModal(widget.id!)}
+          key={widget.id!}
+          widget={widget}
+        />
+      );
     }
     if (widget.component_type.includes("Banner")) {
-      console.log(widget);
-
       return (
         <BannerWidgetCard
           openDeleteModal={() => onOpenDeleteModal(widget.id!)}
