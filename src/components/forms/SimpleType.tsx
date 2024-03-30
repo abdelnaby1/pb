@@ -18,6 +18,7 @@ import { Box, MenuItem, TextField, Typography } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { capitalizeEveryWord } from "../../lib/utils";
 import { SaveOutlined } from "@mui/icons-material";
+import { IWidget, IWidgetData } from "../../interfaces";
 const simpleTypes = [
   "horizontal_brands",
   "vertical_featured_products",
@@ -27,27 +28,29 @@ const simpleTypes = [
 ];
 interface IProps {
   onClose: () => void;
+  setWidgets: (widgets: IWidget[]) => void;
+  widgets: IWidget[];
 }
-interface ISimpleType {
-  name_en: string;
-  name_ar: string;
-  component_type: string;
-}
-const defaultValues: ISimpleType = {
+
+const defaultWidgetData: IWidgetData = {
   name_en: "",
   name_ar: "",
+};
+const defaultSimple: IWidget = {
+  widgetData: defaultWidgetData,
+  order: 0,
   component_type: simpleTypes[0],
 };
-const SimpleTypeForm = ({ onClose }: IProps) => {
+const SimpleTypeForm = ({ onClose, widgets, setWidgets }: IProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const {
     register,
     formState: { errors },
     setValue,
     handleSubmit,
-  } = useForm<ISimpleType>({
+  } = useForm<IWidget>({
     resolver: yupResolver(addSimpeSchema),
-    defaultValues: defaultValues,
+    defaultValues: defaultSimple,
   });
   const onTypeChangeHandler = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -55,10 +58,10 @@ const SimpleTypeForm = ({ onClose }: IProps) => {
     setValue("component_type", e.target.value, { shouldValidate: true });
   };
 
-  const onSubmit: SubmitHandler<ISimpleType> = async (data) => {
+  const onSubmit: SubmitHandler<IWidget> = async (data) => {
     try {
       setIsLoading(true);
-      const widgetsRef = collection(firestore, "widgets");
+      const widgetsRef = collection(firestore, "WIDGETS");
       const querySnapshot = await getDocs(
         query(widgetsRef, orderBy("order", "desc"), limit(1))
       );
@@ -68,11 +71,13 @@ const SimpleTypeForm = ({ onClose }: IProps) => {
         const lastWidget = querySnapshot.docs[0].data();
         nextOrder = lastWidget.order + 1;
       }
-      await addDoc(collection(firestore, "widgets"), {
+      const doc = await addDoc(collection(firestore, "WIDGETS"), {
         ...data,
         id: uuid() + Date.now(),
         order: nextOrder,
       });
+      data.id = doc.id;
+      setWidgets([...widgets, data]);
       toast.success(
         `${capitalizeEveryWord(
           data.component_type.replace(/_/g, " ")
@@ -122,27 +127,27 @@ const SimpleTypeForm = ({ onClose }: IProps) => {
           required
           id="outlined-required"
           label="Name in Enlgish"
-          {...register("name_en", { required: true })}
+          {...register("widgetData.name_en", { required: true })}
         />
-        {errors["name_en"] && (
-          <InputErrorMesaage msg={`${errors["name_en"]?.message}`} />
+        {errors.widgetData?.name_en && (
+          <InputErrorMesaage msg={errors.widgetData?.name_en?.message} />
         )}
         <TextField
           fullWidth
           required
           id="outlined-required"
           label="Name in Arabic"
-          {...register("name_ar", { required: true })}
+          {...register("widgetData.name_ar", { required: true })}
         />
-        {errors["name_ar"] && (
-          <InputErrorMesaage msg={`${errors["name_ar"]?.message}`} />
+        {errors.widgetData?.name_ar && (
+          <InputErrorMesaage msg={errors.widgetData?.name_ar?.message} />
         )}
         <TextField
           fullWidth
           id="outlined-select-currency"
           select
           label="Type"
-          defaultValue={defaultValues.component_type}
+          defaultValue={defaultSimple.component_type}
           helperText="Please select type"
           {...register("component_type", { required: true })}
           onChange={onTypeChangeHandler}

@@ -26,26 +26,27 @@ import {
 } from "@mui/material";
 
 import { capitalizeEveryWord } from "../../lib/utils";
+import { IWidget, IWidgetData } from "../../interfaces";
 const types = [
   "vertical_categories_by_categories_ids",
   "horizontal_categories_by_categories_ids",
 ];
 interface IProps {
   onClose: () => void;
+  setWidgets: (widgets: IWidget[]) => void;
+  widgets: IWidget[];
 }
-interface ICategories {
-  name_en: string;
-  name_ar: string;
-  categories_ids: string[];
-  component_type: string;
-}
-const defaultValues: ICategories = {
+const defaultWidgetData: IWidgetData = {
   name_en: "",
   name_ar: "",
-  component_type: types[0],
   categories_ids: [],
 };
-const CategoriesForm = ({ onClose }: IProps) => {
+const defaultCategories: IWidget = {
+  widgetData: defaultWidgetData,
+  order: 0,
+  component_type: types[0],
+};
+const CategoriesForm = ({ onClose, widgets, setWidgets }: IProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const {
@@ -53,21 +54,21 @@ const CategoriesForm = ({ onClose }: IProps) => {
     formState: { errors },
     setValue,
     handleSubmit,
-  } = useForm<ICategories>({
+  } = useForm<IWidget>({
     resolver: yupResolver(addCategoriesSchema),
-    defaultValues: defaultValues,
+    defaultValues: defaultCategories,
   });
   const onTypeChangeHandler = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setValue("component_type", e.target.value, { shouldValidate: true });
   };
-  const onCategoriesSubmit: SubmitHandler<ICategories> = async (data) => {
+  const onCategoriesSubmit: SubmitHandler<IWidget> = async (data) => {
     console.log(data);
 
     try {
       setIsLoading(true);
-      const widgetsRef = collection(firestore, "widgets");
+      const widgetsRef = collection(firestore, "WIDGETS");
       const querySnapshot = await getDocs(
         query(widgetsRef, orderBy("order", "desc"), limit(1))
       );
@@ -77,11 +78,13 @@ const CategoriesForm = ({ onClose }: IProps) => {
         const lastWidget = querySnapshot.docs[0].data();
         nextOrder = lastWidget.order + 1;
       }
-      await addDoc(collection(firestore, "widgets"), {
+      const doc = await addDoc(collection(firestore, "WIDGETS"), {
         ...data,
         id: uuid() + Date.now(),
         order: nextOrder,
       });
+      data.id = doc.id;
+      setWidgets([...widgets, data]);
       toast.success(
         `${capitalizeEveryWord(
           data.component_type.replace(/_/g, " ")
@@ -133,27 +136,27 @@ const CategoriesForm = ({ onClose }: IProps) => {
           required
           id="outlined-required"
           label="Name in Enlgish"
-          {...register("name_en", { required: true })}
+          {...register("widgetData.name_en", { required: true })}
         />
-        {errors["name_en"] && (
-          <InputErrorMesaage msg={`${errors["name_en"]?.message}`} />
+        {errors.widgetData?.name_en && (
+          <InputErrorMesaage msg={errors.widgetData?.name_en?.message} />
         )}
         <TextField
           fullWidth
           required
           id="outlined-required"
           label="Name in Arabic"
-          {...register("name_ar", { required: true })}
+          {...register("widgetData.name_ar", { required: true })}
         />
-        {errors["name_ar"] && (
-          <InputErrorMesaage msg={`${errors["name_ar"]?.message}`} />
+        {errors.widgetData?.name_ar && (
+          <InputErrorMesaage msg={errors.widgetData?.name_ar?.message} />
         )}
         <TextField
           fullWidth
           id="outlined-select-currency"
           select
           label="Type"
-          defaultValue={defaultValues.component_type}
+          defaultValue={defaultCategories.component_type}
           helperText="Please select type"
           {...register("component_type", { required: true })}
           onChange={onTypeChangeHandler}
@@ -167,11 +170,13 @@ const CategoriesForm = ({ onClose }: IProps) => {
         <Autocomplete
           multiple
           id="tags-filled"
-          options={defaultValues.categories_ids.map((option) => option)}
-          defaultValue={defaultValues.categories_ids}
+          options={defaultCategories.widgetData?.categories_ids!.map(
+            (option) => option
+          )}
+          defaultValue={defaultCategories.widgetData.categories_ids}
           freeSolo
           onChange={(e, newval) => {
-            setValue("categories_ids", newval);
+            setValue("widgetData.categories_ids", newval);
           }}
           renderTags={(value: readonly string[], getTagProps) =>
             value.map((option: string, index: number) => (
@@ -192,8 +197,8 @@ const CategoriesForm = ({ onClose }: IProps) => {
           )}
         />
 
-        {errors["categories_ids"] && (
-          <InputErrorMesaage msg={`${errors["categories_ids"]?.message}`} />
+        {errors.widgetData?.categories_ids && (
+          <InputErrorMesaage msg={errors.widgetData?.categories_ids.message} />
         )}
         <LoadingButton
           fullWidth

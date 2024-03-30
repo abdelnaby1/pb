@@ -3,7 +3,7 @@ import InputErrorMesaage from "../InputErrorMesaage";
 import Button from "../UI/Button";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { bannerTypes, BANNER_FORM } from "../../data";
+import { bannerTypes } from "../../data";
 import { addBannerSchema } from "../../validation";
 import Input from "../UI/Input";
 import { uploadBannerToStorage } from "../../firebase/functions";
@@ -19,34 +19,37 @@ import {
 } from "firebase/firestore";
 import { firestore } from "../../firebase/config";
 import { v4 as uuid } from "uuid";
+import { IWidget, IWidgetData } from "../../interfaces";
 
 interface IProps {
   onClose: () => void;
+  setWidgets: (widgets: IWidget[]) => void;
+  widgets: IWidget[];
 }
 interface IImgInput {
-  [banner_img_en: string]: File;
-  banner_img_ar: File;
+  banner_img_en: File | null;
+  banner_img_ar: File | null;
 }
-interface IBanner {
-  name_en: string;
-  name_ar: string;
-  url_en: string;
-  url_ar: string;
-  ref_type: string;
-  ref_id?: number;
-}
-const defaultBanner: IBanner = {
+
+const defaultWidgetData: IWidgetData = {
   name_en: "",
   name_ar: "",
   url_en: "",
   url_ar: "",
   ref_type: "",
 };
+const defaultBanner: IWidget = {
+  widgetData: defaultWidgetData,
+  order: 0,
+  component_type: "Banner",
+};
 
-const BannerForm = ({ onClose }: IProps) => {
-  const [bannerData, setBannerData] = useState(defaultBanner);
+const BannerForm = ({ onClose, setWidgets, widgets }: IProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [bannerImgs, setBannerImgs] = useState<IImgInput>(null);
+  const [bannerImgs, setBannerImgs] = useState<IImgInput>({
+    banner_img_en: null,
+    banner_img_ar: null,
+  });
   const [bannerImgEnError, setBannerImgEnError] = useState<string>("");
   const [bannerImgArError, setBannerImgArError] = useState<string>("");
   const [selectedBannerTypeId, setSelectedBannerTypeId] = useState<number>(
@@ -58,17 +61,17 @@ const BannerForm = ({ onClose }: IProps) => {
     unregister,
     clearErrors,
     formState: { errors },
+    getValues,
     handleSubmit,
-  } = useForm<IBanner>({
-    defaultValues: bannerData,
+  } = useForm<IWidget>({
+    defaultValues: defaultBanner,
     resolver: yupResolver(addBannerSchema),
   });
 
-  const onBannerSubmit: SubmitHandler<IBanner> = async (data) => {
+  const onBannerSubmit: SubmitHandler<IWidget> = async (data) => {
     try {
       setIsLoading(true);
-      setBannerData((prev) => ({ ...prev, ...data }));
-      const widgetsRef = collection(firestore, "widgets");
+      const widgetsRef = collection(firestore, "WIDGETS");
       const querySnapshot = await getDocs(
         query(widgetsRef, orderBy("order", "desc"), limit(1))
       );
@@ -78,14 +81,14 @@ const BannerForm = ({ onClose }: IProps) => {
         const lastWidget = querySnapshot.docs[0].data();
         nextOrder = lastWidget.order + 1;
       }
-      const banner = {
-        ...bannerData,
+
+      data.order = nextOrder;
+      const doc = await addDoc(collection(firestore, "WIDGETS"), {
         ...data,
         id: uuid() + Date.now(),
-        component_type: "Banner",
-        order: nextOrder,
-      };
-      await addDoc(collection(firestore, "widgets"), banner);
+      });
+      data.id = doc.id;
+      setWidgets([...widgets, data]);
       toast.success("Banner added successfully ", {
         duration: 1500,
         position: "top-center",
@@ -157,29 +160,26 @@ const BannerForm = ({ onClose }: IProps) => {
     e.preventDefault();
     try {
       setIsLoading(true);
-      const imgs = [
-        uploadBannerToStorage(bannerImgs.banner_img_en),
-        uploadBannerToStorage(bannerImgs.banner_img_ar),
-      ];
-      imageUrls = (await Promise.all(imgs)) as string[];
-      setBannerData({
-        ...bannerData,
-        url_en: imageUrls?.[0],
-        url_ar: imageUrls[1],
-      });
-      setValue("url_en", imageUrls?.[0]);
-      setValue("url_ar", imageUrls?.[1]);
-      clearErrors("url_en");
-      clearErrors("url_ar");
-      toast.success("Imaeges were uploaded successfully ", {
-        duration: 1500,
-        position: "top-center",
-        style: {
-          backgroundColor: "black",
-          color: "white",
-          width: "fit-content",
-        },
-      });
+      if (bannerImgs.banner_img_en && bannerImgs.banner_img_ar) {
+        const imgs = [
+          uploadBannerToStorage(bannerImgs.banner_img_en),
+          uploadBannerToStorage(bannerImgs.banner_img_ar),
+        ];
+        imageUrls = (await Promise.all(imgs)) as string[];
+        setValue("widgetData.url_en", imageUrls?.[0]);
+        setValue("widgetData.url_ar", imageUrls?.[1]);
+        clearErrors("widgetData.url_en");
+        clearErrors("widgetData.url_ar");
+        toast.success("Imaeges were uploaded successfully ", {
+          duration: 1500,
+          position: "top-center",
+          style: {
+            backgroundColor: "black",
+            color: "white",
+            width: "fit-content",
+          },
+        });
+      }
     } catch (error) {
       // const errorObj = error as FirebaseError
       toast.error("Someting went wrong", {
@@ -199,34 +199,18 @@ const BannerForm = ({ onClose }: IProps) => {
   useEffect(() => {
     if (selectedBannerTypeId) {
       const type = bannerTypes.find((type) => type.id === selectedBannerTypeId);
-      setValue("ref_type", `${type?.type}`);
+      setValue("widgetData.ref_type", `${type?.type}`);
     }
     if (selectedBannerTypeId === 1) {
-      unregister("ref_id");
+      unregister("widgetData.ref_id");
     }
   }, [selectedBannerTypeId, setValue, unregister]);
-
-  const renderBannerForm = BANNER_FORM.map((input, idx) => {
-    return (
-      <div key={idx} className="flex flex-col">
-        <Input
-          placeholder={input.placeholder}
-          type={input.type}
-          {...register(input.name, input.validation)}
-        />
-        {errors[input.name] && (
-          <InputErrorMesaage msg={errors[input.name]?.message} />
-        )}
-      </div>
-    );
-  });
-
   return (
     <div className="mt-5">
       <h2 className="text-center mb-4 text-3xl font-semibold">
         Add Banner Widget
       </h2>
-      {!bannerData.url_en && !bannerData.name_ar && (
+      {!getValues("widgetData.url_en") && !getValues("widgetData.url_ar") && (
         <form className="space-y-4" onSubmit={uploadImages}>
           <div className="flex flex-row items-center justify-center space-x-2">
             <div className="space-y-2">
@@ -269,30 +253,45 @@ const BannerForm = ({ onClose }: IProps) => {
           </Button>
         </form>
       )}
-      {bannerData.url_en && bannerData.url_ar && (
+      {getValues("widgetData.url_en") && getValues("widgetData.url_ar") && (
         <form className="space-y-3" onSubmit={handleSubmit(onBannerSubmit)}>
           <Input
             disabled
             type={"text"}
-            value={bannerData.url_en}
-            {...register("url_en")}
+            value={getValues("widgetData.url_en")}
+            {...register("widgetData.url_en")}
           />
           <Input
             disabled
             type={"text"}
-            value={bannerData.url_ar}
-            {...register("url_ar")}
+            value={getValues("widgetData.url_ar")}
+            {...register("widgetData.url_ar")}
           />
-          {renderBannerForm}
+          <Input
+            placeholder={"Name in Enlish"}
+            type={"text"}
+            {...register("widgetData.name_en")}
+          />
+          {errors.widgetData?.name_en && (
+            <InputErrorMesaage msg={errors.widgetData?.name_en.message} />
+          )}
+          <Input
+            placeholder={"Name in Arabic"}
+            type={"text"}
+            {...register("widgetData.name_ar")}
+          />
+          {errors.widgetData?.name_ar && (
+            <InputErrorMesaage msg={errors.widgetData?.name_ar.message} />
+          )}
           {selectedBannerTypeId !== 1 ? (
             <>
               <Input
                 placeholder={"Reference Id"}
                 type={"text"}
-                {...register("ref_id", { required: true })}
+                {...register("widgetData.ref_id", { required: true })}
               />
-              {errors["ref_id"] && (
-                <InputErrorMesaage msg={errors["ref_id"]?.message} />
+              {errors.widgetData?.ref_id && (
+                <InputErrorMesaage msg={errors.widgetData?.ref_id.message} />
               )}
             </>
           ) : null}

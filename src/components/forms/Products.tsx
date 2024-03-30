@@ -26,6 +26,7 @@ import {
 } from "@mui/material";
 
 import { capitalizeEveryWord } from "../../lib/utils";
+import { IWidget, IWidgetData } from "../../interfaces";
 const types = [
   "vertical_products_by_category_id",
   "horizontal_products_by_category_id",
@@ -34,20 +35,19 @@ const types = [
 ];
 interface IProps {
   onClose: () => void;
+  setWidgets: (widgets: IWidget[]) => void;
+  widgets: IWidget[];
 }
-interface IProducts {
-  name_en: string;
-  name_ar: string;
-  cat_id?: number;
-  products_ids?: string[];
-  component_type: string;
-}
-const defaultValues: IProducts = {
+const defaultWidgetData: IWidgetData = {
   name_en: "",
   name_ar: "",
+};
+const defaultProducts: IWidget = {
+  widgetData: defaultWidgetData,
+  order: 0,
   component_type: types[0],
 };
-const ProductsForm = ({ onClose }: IProps) => {
+const ProductsForm = ({ onClose, widgets, setWidgets }: IProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const {
@@ -58,24 +58,26 @@ const ProductsForm = ({ onClose }: IProps) => {
     handleSubmit,
     setError,
     unregister,
-  } = useForm<IProducts>({
+  } = useForm<IWidget>({
     resolver: yupResolver(addProductsSchema),
-    defaultValues: defaultValues,
+    defaultValues: defaultProducts,
   });
   const onTypeChangeHandler = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setValue("component_type", e.target.value, { shouldValidate: true });
     if (getValues("component_type").includes("by_products_ids")) {
-      unregister("cat_id");
+      unregister("widgetData.cat_id");
+    } else if (getValues("component_type").includes("by_category_id")) {
+      unregister("widgetData.products_ids");
     }
   };
-  const onProductsSubmit: SubmitHandler<IProducts> = async (data) => {
+  const onProductsSubmit: SubmitHandler<IWidget> = async (data) => {
     if (
-      !data.products_ids?.length &&
+      !data.widgetData.products_ids?.length &&
       data.component_type.includes("by_products_ids")
     ) {
-      setError("products_ids", {
+      setError("widgetData.products_ids", {
         type: "required",
         message: "Products Ids required",
       });
@@ -84,23 +86,26 @@ const ProductsForm = ({ onClose }: IProps) => {
 
     try {
       setIsLoading(true);
-      const widgetsRef = collection(firestore, "widgets");
+      const widgetsRef = collection(firestore, "WIDGETS");
       const querySnapshot = await getDocs(
         query(widgetsRef, orderBy("order", "desc"), limit(1))
       );
       let nextOrder = 1;
 
-      console.log(querySnapshot);
+      // console.log(querySnapshot);
 
       if (!querySnapshot.empty) {
         const lastWidget = querySnapshot.docs[0].data();
         nextOrder = lastWidget.order + 1;
       }
-      await addDoc(collection(firestore, "widgets"), {
+
+      const doc = await addDoc(collection(firestore, "WIDGETS"), {
         ...data,
         id: uuid() + Date.now(),
         order: nextOrder,
       });
+      data.id = doc.id;
+      setWidgets([...widgets, data]);
       toast.success(
         `${capitalizeEveryWord(
           data.component_type.replace(/_/g, " ")
@@ -136,16 +141,18 @@ const ProductsForm = ({ onClose }: IProps) => {
       getValues("component_type") === "vertical_products_by_products_ids" ||
       getValues("component_type") === "horizontal_products_by_products_ids"
     ) {
-      defaultValues.products_ids = [];
+      defaultProducts.widgetData.products_ids = [];
       return (
         <Autocomplete
           multiple
           id="tags-filled"
-          options={defaultValues.products_ids.map((option) => option)}
-          defaultValue={defaultValues.products_ids}
+          options={defaultProducts.widgetData.products_ids.map(
+            (option) => option
+          )}
+          defaultValue={defaultProducts.widgetData.products_ids}
           freeSolo
           onChange={(e, newval) => {
-            setValue("products_ids", newval);
+            setValue("widgetData.products_ids", newval);
           }}
           renderTags={(value: readonly string[], getTagProps) =>
             value.map((option: string, index: number) => (
@@ -177,13 +184,12 @@ const ProductsForm = ({ onClose }: IProps) => {
             required
             id="outlined-required"
             label="Category ID"
-            {...register("cat_id", { required: true })}
+            {...register("widgetData.cat_id", { required: true })}
           />
         </>
       );
     }
   };
-
   return (
     <Box component="section" sx={{ my: 2 }}>
       <Typography variant="h5" color="text.secondry" gutterBottom>
@@ -203,27 +209,27 @@ const ProductsForm = ({ onClose }: IProps) => {
           required
           id="outlined-required"
           label="Name in Enlgish"
-          {...register("name_en", { required: true })}
+          {...register("widgetData.name_en", { required: true })}
         />
-        {errors["name_en"] && (
-          <InputErrorMesaage msg={`${errors["name_en"]?.message}`} />
+        {errors.widgetData?.name_en && (
+          <InputErrorMesaage msg={errors.widgetData?.name_en?.message} />
         )}
         <TextField
           fullWidth
           required
           id="outlined-required"
           label="Name in Arabic"
-          {...register("name_ar", { required: true })}
+          {...register("widgetData.name_ar", { required: true })}
         />
-        {errors["name_ar"] && (
-          <InputErrorMesaage msg={`${errors["name_ar"]?.message}`} />
+        {errors.widgetData?.name_ar && (
+          <InputErrorMesaage msg={errors.widgetData?.name_ar?.message} />
         )}
         <TextField
           fullWidth
           id="outlined-select-currency"
           select
           label="Type"
-          defaultValue={defaultValues.component_type}
+          defaultValue={defaultProducts.component_type}
           helperText="Please select type"
           {...register("component_type", { required: true })}
           onChange={onTypeChangeHandler}
@@ -235,11 +241,11 @@ const ProductsForm = ({ onClose }: IProps) => {
           ))}
         </TextField>
         {renderReaminingInputs()}
-        {errors["cat_id"] && (
-          <InputErrorMesaage msg={`${errors["cat_id"]?.message}`} />
+        {errors.widgetData?.cat_id && (
+          <InputErrorMesaage msg={errors.widgetData?.cat_id?.message} />
         )}
-        {errors["products_ids"] && (
-          <InputErrorMesaage msg={`${errors["products_ids"]?.message}`} />
+        {errors.widgetData?.products_ids && (
+          <InputErrorMesaage msg={errors.widgetData?.products_ids?.message} />
         )}
         <LoadingButton
           fullWidth

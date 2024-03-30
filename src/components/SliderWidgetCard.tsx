@@ -1,4 +1,4 @@
-import { ISliderWidget } from "../interfaces";
+import { IWidget } from "../interfaces";
 import Button from "./UI/Button";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
@@ -8,20 +8,23 @@ import { Navigation } from "swiper/modules";
 import Image from "./UI/Image";
 import { Fragment } from "react/jsx-runtime";
 import { Modal } from "./UI/Modal";
-import WidgetForm from "./forms/WidgetForm";
 import { useState } from "react";
 import { RiDeleteBin2Fill } from "react-icons/ri";
 import { doc, updateDoc } from "firebase/firestore";
 import { firestore } from "../firebase/config";
 import toast from "react-hot-toast";
 import { removeBannerFromStorage } from "../firebase/functions";
+import SliderForm from "./forms/Slider";
 
 interface IProps {
-  widget: ISliderWidget;
+  widget: IWidget;
   openDeleteModal: (id: string) => void;
 }
 const SliderWidgetCard = ({ widget, openDeleteModal }: IProps) => {
-  const { component_type, data } = widget;
+  const {
+    component_type,
+    widgetData: { data },
+  } = widget;
   const [isOpenAddModal, setIsOpenAddModal] = useState(false);
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
   const [sliderToRemoveIdx, setSliderToRemoveIdx] = useState<number>();
@@ -32,7 +35,7 @@ const SliderWidgetCard = ({ widget, openDeleteModal }: IProps) => {
     setIsOpenAddModal(false);
   };
   const onRemove = () => {
-    openDeleteModal(widget.id);
+    openDeleteModal(widget.id!);
   };
   const onCloseDeleteModal = () => {
     setIsOpenDeleteModal(false);
@@ -41,18 +44,24 @@ const SliderWidgetCard = ({ widget, openDeleteModal }: IProps) => {
     setSliderToRemoveIdx(idx);
     setIsOpenDeleteModal(true);
   };
-  // console.log("data", data);
 
   const onOneSliderRemove = async () => {
     try {
-      await removeBannerFromStorage(data[sliderToRemoveIdx!].url_en);
-      await removeBannerFromStorage(data[sliderToRemoveIdx!].url_ar);
+      if (data && data.length && sliderToRemoveIdx) {
+        await removeBannerFromStorage(data[sliderToRemoveIdx].url_en);
+        await removeBannerFromStorage(data[sliderToRemoveIdx].url_ar);
+        const sliderRef = doc(firestore, "WIDGETS", widget.id!);
+        console.log("widget.id", widget.id);
 
-      const sliderRef = doc(firestore, "widgets", widget.id);
-      widget.data = data.splice(sliderToRemoveIdx!, 1);
-      await updateDoc(sliderRef, {
-        data: data,
-      });
+        console.log("sliderref", sliderRef);
+
+        data.splice(sliderToRemoveIdx!, 1);
+        console.log("after modify", data);
+
+        await updateDoc(sliderRef, {
+          widgetData: { data: data },
+        });
+      }
       toast.success("Slider item deleted successfully", {
         duration: 1500,
         position: "top-center",
@@ -81,14 +90,14 @@ const SliderWidgetCard = ({ widget, openDeleteModal }: IProps) => {
   return (
     <div className="max-h-fit mx-auto md:mx-0 border rounded-md p-2 flex flex-col">
       <div className="flex items-center justify-center relative">
-        {data.map((slider, idx) => (
+        {data?.map((slider, idx) => (
           <Fragment key={slider.name_en}>
             <Swiper
               navigation={true}
               modules={[Navigation]}
               className="mySwiper"
             >
-              {data.length > 1 && (
+              {data?.length > 1 && (
                 <div
                   className="absolute top-0 right-0 z-10 cursor-pointer"
                   onClick={() => onOpenDeleteModal(idx)}
@@ -139,6 +148,14 @@ const SliderWidgetCard = ({ widget, openDeleteModal }: IProps) => {
                   {slider.ref_type}
                 </span>
               </h3>
+              {slider.ref_id && (
+                <h3>
+                  Reference ID:{" "}
+                  <span className="text-red-950 textbo font-bold">
+                    {slider.ref_id}
+                  </span>
+                </h3>
+              )}
             </Swiper>
           </Fragment>
         ))}
@@ -161,11 +178,10 @@ const SliderWidgetCard = ({ widget, openDeleteModal }: IProps) => {
         closeModal={onCloseAddBannerModal}
         title="Add another Banner to the Slider"
       >
-        <WidgetForm
-          onCloseModal={onCloseAddBannerModal}
-          sliderAction="Update"
+        <SliderForm
+          sliderAction={"Update"}
           sliderId={widget.id}
-          type={"Slider"}
+          onClose={onCloseAddBannerModal}
         />
       </Modal>
     </div>
