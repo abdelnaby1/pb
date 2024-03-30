@@ -40,7 +40,7 @@ const WidgetsList = ({ widgets, setWidgets }: IProps) => {
   };
   const getWidgets = async () => {
     try {
-      const widgetsRef = collection(firestore, "widgets_test");
+      const widgetsRef = collection(firestore, "WIDGETS");
       const querySnapshot = await getDocs(query(widgetsRef, orderBy("order")));
 
       const arr: IWidget[] = [];
@@ -67,7 +67,7 @@ const WidgetsList = ({ widgets, setWidgets }: IProps) => {
         //deleteing images
         await removeBannerFromStorage(widgetToDelete.widgetData.url_en!);
         await removeBannerFromStorage(widgetToDelete.widgetData.url_ar!);
-        await deleteDoc(doc(firestore, "widgets_test", widgetToDeleteId));
+        await deleteDoc(doc(firestore, "WIDGETS", widgetToDeleteId));
       } else if (
         widgetToDeleteId &&
         widgetToDelete?.component_type === "Slider"
@@ -79,9 +79,9 @@ const WidgetsList = ({ widgets, setWidgets }: IProps) => {
           urls.push(w.url_ar);
         });
         await removeSliderrFromStorage(urls);
-        await deleteDoc(doc(firestore, "widgets_test", widgetToDeleteId));
+        await deleteDoc(doc(firestore, "WIDGETS", widgetToDeleteId));
       } else if (widgetToDeleteId) {
-        await deleteDoc(doc(firestore, "widgets_test", widgetToDeleteId));
+        await deleteDoc(doc(firestore, "WIDGETS", widgetToDeleteId));
         setWidgets(updatedWidgets);
       }
       setWidgets(updatedWidgets);

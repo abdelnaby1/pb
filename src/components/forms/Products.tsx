@@ -86,7 +86,7 @@ const ProductsForm = ({ onClose, widgets, setWidgets }: IProps) => {
 
     try {
       setIsLoading(true);
-      const widgetsRef = collection(firestore, "widgets_test");
+      const widgetsRef = collection(firestore, "WIDGETS");
       const querySnapshot = await getDocs(
         query(widgetsRef, orderBy("order", "desc"), limit(1))
       );
@@ -99,7 +99,7 @@ const ProductsForm = ({ onClose, widgets, setWidgets }: IProps) => {
         nextOrder = lastWidget.order + 1;
       }
 
-      const doc = await addDoc(collection(firestore, "widgets_test"), {
+      const doc = await addDoc(collection(firestore, "WIDGETS"), {
         ...data,
         id: uuid() + Date.now(),
         order: nextOrder,
