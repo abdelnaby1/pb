@@ -71,7 +71,7 @@ const BannerForm = ({ onClose, setWidgets, widgets }: IProps) => {
   const onBannerSubmit: SubmitHandler<IWidget> = async (data) => {
     try {
       setIsLoading(true);
-      const widgetsRef = collection(firestore, "widgets");
+      const widgetsRef = collection(firestore, "widgets_test");
       const querySnapshot = await getDocs(
         query(widgetsRef, orderBy("order", "desc"), limit(1))
       );
@@ -83,7 +83,7 @@ const BannerForm = ({ onClose, setWidgets, widgets }: IProps) => {
       }
 
       data.order = nextOrder;
-      const doc = await addDoc(collection(firestore, "widgets"), {
+      const doc = await addDoc(collection(firestore, "widgets_test"), {
         ...data,
         id: uuid() + Date.now(),
       });

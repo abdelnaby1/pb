@@ -72,7 +72,7 @@ const SliderForm = ({ onClose, sliderAction, sliderId }: IProps) => {
   const onBannerSubmit: SubmitHandler<IWidget> = async (data) => {
     try {
       setIsLoading(true);
-      const widgetsRef = collection(firestore, "widgets");
+      const widgetsRef = collection(firestore, "widgets_test");
       const querySnapshot = await getDocs(
         query(widgetsRef, orderBy("order", "desc"), limit(1))
       );
@@ -87,7 +87,7 @@ const SliderForm = ({ onClose, sliderAction, sliderId }: IProps) => {
           ? sliderId
           : `slieder-${Date.now() + data.widgetData.name_en}`;
 
-      const sliderRef = doc(firestore, "widgets", `${sliderDocName}`);
+      const sliderRef = doc(firestore, "widgets_test", `${sliderDocName}`);
       data.order = nextOrder;
       if (sliderAction === "Update") {
         await setDoc(

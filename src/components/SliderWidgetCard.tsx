@@ -21,8 +21,6 @@ interface IProps {
   openDeleteModal: (id: string) => void;
 }
 const SliderWidgetCard = ({ widget, openDeleteModal }: IProps) => {
-  console.log("sl", widget);
-
   const {
     component_type,
     widgetData: { data },
@@ -50,13 +48,18 @@ const SliderWidgetCard = ({ widget, openDeleteModal }: IProps) => {
   const onOneSliderRemove = async () => {
     try {
       if (data && data.length && sliderToRemoveIdx) {
-        console.log(data[0].url_en);
         await removeBannerFromStorage(data[sliderToRemoveIdx].url_en);
         await removeBannerFromStorage(data[sliderToRemoveIdx].url_ar);
-        const sliderRef = doc(firestore, "widgets", widget.id!);
-        widget.widgetData.data = data.splice(sliderToRemoveIdx!, 1);
+        const sliderRef = doc(firestore, "widgets_test", widget.id!);
+        console.log("widget.id", widget.id);
+
+        console.log("sliderref", sliderRef);
+
+        data.splice(sliderToRemoveIdx!, 1);
+        console.log("after modify", data);
+
         await updateDoc(sliderRef, {
-          data: data,
+          widgetData: { data: data },
         });
       }
       toast.success("Slider item deleted successfully", {
