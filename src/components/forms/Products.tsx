@@ -151,7 +151,7 @@ const ProductsForm = ({ onClose, widgets, setWidgets }: IProps) => {
           )}
           defaultValue={defaultProducts.widgetData.products_ids}
           freeSolo
-          onChange={(e, newval) => {
+          onChange={(_, newval) => {
             setValue("widgetData.products_ids", newval);
           }}
           renderTags={(value: readonly string[], getTagProps) =>

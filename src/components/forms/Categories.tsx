@@ -175,7 +175,7 @@ const CategoriesForm = ({ onClose, widgets, setWidgets }: IProps) => {
           )}
           defaultValue={defaultCategories.widgetData.categories_ids}
           freeSolo
-          onChange={(e, newval) => {
+          onChange={(_, newval) => {
             setValue("widgetData.categories_ids", newval);
           }}
           renderTags={(value: readonly string[], getTagProps) =>
