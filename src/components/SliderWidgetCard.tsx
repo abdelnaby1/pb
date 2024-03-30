@@ -51,12 +51,8 @@ const SliderWidgetCard = ({ widget, openDeleteModal }: IProps) => {
         await removeBannerFromStorage(data[sliderToRemoveIdx].url_en);
         await removeBannerFromStorage(data[sliderToRemoveIdx].url_ar);
         const sliderRef = doc(firestore, "WIDGETS", widget.id!);
-        console.log("widget.id", widget.id);
-
-        console.log("sliderref", sliderRef);
 
         data.splice(sliderToRemoveIdx!, 1);
-        console.log("after modify", data);
 
         await updateDoc(sliderRef, {
           widgetData: { data: data },

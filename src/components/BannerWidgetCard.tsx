@@ -16,7 +16,7 @@ const BannerWidgetCard = ({ widget, openDeleteModal }: IProps) => {
     widgetData: { url_en, url_ar, ref_type, name_en, name_ar, ref_id },
   } = widget;
   const onRemove = () => {
-    openDeleteModal(widget.id);
+    openDeleteModal(widget.id!);
   };
   return (
     <div className="max-h-fit mx-auto md:mx-0 border rounded-md p-2 flex flex-col">
